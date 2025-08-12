@@ -1,3 +1,5 @@
+export const selectedCountry = 'US';
+export const selectedState = 'Florida';
 export const zoneData = [
   { label: 'Alabama', value: 'AL' },
   { label: 'Arkansas', value: 'AR' },

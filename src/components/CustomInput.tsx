@@ -1,23 +1,11 @@
 import React, { useState } from 'react';
-import {
-  View,
-  TextInput,
-  StyleSheet,
-  TextInputProps,
-  ViewStyle,
-  TouchableOpacity,
-} from 'react-native';
+import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+
 import CustomText from './CustomText';
 import { EyeClosed, EyeOpen } from '../assets';
+import { brdrColor, textColor } from '../constants/colors';
+import { CustomInputProps } from '../types';
 // import useTheme from '../theme/useTheme';
-
-interface CustomInputProps extends TextInputProps {
-  label?: string;
-  error?: string;
-  hasError?: boolean;
-  style?: ViewStyle;
-  bgColor?: string;
-}
 
 const CustomInput: React.FC<CustomInputProps> = ({
   label,
@@ -49,7 +37,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
           styles.inputContainer,
           props.multiline && styles.inputContainerMultiline,
           hasError && styles.inputError,
-          { backgroundColor: bgColor, borderColor: '#E0E0E0' },
+          { backgroundColor: bgColor, borderColor: brdrColor },
           style,
         ]}
       >
@@ -59,7 +47,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
             props.multiline && styles.multilineInput,
             hasError && styles.inputTextError,
             {
-              color: '#333',
+              color: textColor,
               // color: theme.dark ? '#efefef' : '#333',
               fontFamily: 'Gilroy-Medium',
               fontSize: 16,

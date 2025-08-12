@@ -14,21 +14,56 @@ import CustomButton from '../../components/CustomButton';
 import CustomDropdown from '../../components/CustomDropdown';
 import { bgColor } from '../../constants/colors';
 import { zoneData } from '../../constants';
+import SuccessModal from '../../components/SuccessModal';
 
 type Props = { navigation: RootStackNavigationProp<'SignUp'> };
 
 export default function SignUpScreen({ navigation }: Props) {
   const [step, setStep] = useState(1);
 
-  // Step 1 form data
+  // Form data
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [country, setCountry] = useState('');
   const [state, setState] = useState('');
-
   const [selectedZone, setSelectedZone] = useState<string | undefined>();
+
+  // Error state
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Modal state
+  const [isSuccessModalVisible, setSuccessModalVisible] = useState(false);
+
+  const validateStep1 = () => {
+    let newErrors: Record<string, string> = {};
+    if (!firstName.trim()) newErrors.firstName = 'First name is required';
+    if (!lastName.trim()) newErrors.lastName = 'Last name is required';
+    if (!email.trim()) newErrors.email = 'Email is required';
+    else if (!/^\S+@\S+\.\S+$/.test(email)) newErrors.email = 'Invalid email';
+    if (!password.trim()) newErrors.password = 'Password is required';
+    else if (password.length < 6) newErrors.password = 'Min 6 characters';
+    if (!country.trim()) newErrors.country = 'Country is required';
+    if (!state.trim()) newErrors.state = 'State is required';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep2 = () => {
+    let newErrors: Record<string, string> = {};
+    if (!selectedZone) newErrors.zone = 'Please select a zone';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNextOrSubmit = () => {
+    if (step === 1) {
+      if (validateStep1()) setStep(2);
+    } else {
+      if (validateStep2()) setSuccessModalVisible(true);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -41,7 +76,7 @@ export default function SignUpScreen({ navigation }: Props) {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.container}>
-            {/* Title & Description */}
+            {/* Step Titles */}
             {step === 1 ? (
               <>
                 <CustomText
@@ -67,15 +102,13 @@ export default function SignUpScreen({ navigation }: Props) {
                 </CustomText>
               </>
             ) : (
-              <>
-                <CustomText
-                  size={23}
-                  fontFamily="Gilroy-Bold"
-                  style={styles.title}
-                >
-                  Select Zone
-                </CustomText>
-              </>
+              <CustomText
+                size={23}
+                fontFamily="Gilroy-Bold"
+                style={styles.title}
+              >
+                Select Zone
+              </CustomText>
             )}
 
             {/* Step 1 Inputs */}
@@ -86,12 +119,14 @@ export default function SignUpScreen({ navigation }: Props) {
                   placeholder="Enter your first name"
                   value={firstName}
                   onChangeText={setFirstName}
+                  error={errors.firstName}
                 />
                 <CustomInput
                   label="Last Name"
                   placeholder="Enter your last name"
                   value={lastName}
                   onChangeText={setLastName}
+                  error={errors.lastName}
                 />
                 <CustomInput
                   label="Email Address"
@@ -99,6 +134,7 @@ export default function SignUpScreen({ navigation }: Props) {
                   keyboardType="email-address"
                   value={email}
                   onChangeText={setEmail}
+                  error={errors.email}
                 />
                 <CustomInput
                   label="Password"
@@ -106,69 +142,72 @@ export default function SignUpScreen({ navigation }: Props) {
                   secureTextEntry
                   value={password}
                   onChangeText={setPassword}
+                  error={errors.password}
                 />
                 <CustomInput
                   label="Country"
                   placeholder="Enter your country"
                   value={country}
                   onChangeText={setCountry}
+                  error={errors.country}
                 />
                 <CustomInput
                   label="State"
                   placeholder="Enter your state"
                   value={state}
                   onChangeText={setState}
+                  error={errors.state}
                 />
               </>
             )}
 
-            <View
-              style={{
-                flex: 1,
-                justifyContent: 'space-between',
-              }}
-            >
-              {/* Step 2 Inputs */}
-              {step === 2 && (
-                <View
-                  style={{
-                    marginTop: 20,
-                  }}
+            {/* Step 2 */}
+            {step === 2 && (
+              <View style={{ marginTop: 20 }}>
+                <CustomText
+                  size={17}
+                  fontFamily="Gilroy-Medium"
+                  color="#797777"
+                  style={{ marginBottom: 10 }}
                 >
-                  <CustomText
-                    size={17}
-                    fontFamily="Gilroy-Medium"
-                    color="#797777"
-                    style={{ marginBottom: 10 }}
-                  >
-                    Choose your Zone
-                  </CustomText>
-
-                  <CustomDropdown
-                    data={zoneData}
-                    placeholder="Select Zone"
-                    selectedValue={selectedZone}
-                    onSelect={item => setSelectedZone(item.value)}
-                    maxHeight={500}
-                  />
-                </View>
-              )}
-
-              <View style={styles.bottomButtonContainer}>
-                <CustomButton
-                  title={step === 1 ? 'Next' : 'Create New Account'}
-                  onPress={() => {
-                    if (step === 1) {
-                      setStep(2);
-                    } else {
-                      navigation.navigate('HomeTabs');
-                    }
-                  }}
+                  Choose your Zone
+                </CustomText>
+                <CustomDropdown
+                  data={zoneData}
+                  placeholder="Select Zone"
+                  selectedValue={selectedZone}
+                  onSelect={item => setSelectedZone(item.value)}
+                  maxHeight={500}
+                  error={errors.zone}
                 />
               </View>
-            </View>
+            )}
+
+            {/* Bottom Button */}
+            {step === 1 && (
+              <View style={styles.bottomButtonContainer}>
+                <CustomButton title={'Next'} onPress={handleNextOrSubmit} />
+              </View>
+            )}
           </View>
+
+          {/* Success Modal */}
+          <SuccessModal
+            visible={isSuccessModalVisible}
+            onGoHome={() => {
+              setSuccessModalVisible(false);
+              navigation.replace('HomeTabs');
+            }}
+          />
         </ScrollView>
+        {step === 2 && (
+          <View style={styles.bottomButtonContainer}>
+            <CustomButton
+              title={'Create New Account'}
+              onPress={handleNextOrSubmit}
+            />
+          </View>
+        )}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -184,14 +223,13 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     padding: 20,
-    flexGrow: 1,
+    // flex: 1,
     // paddingBottom: 100,
-    // justifyContent: 'space-between',
+    justifyContent: 'space-between',
   },
   container: {
-    // flexGrow: 1,
     flex: 1,
-    // justifyContent: 'center',
+    justifyContent: 'space-between',
   },
   title: {
     paddingVertical: '5%',
@@ -207,6 +245,5 @@ const styles = StyleSheet.create({
   },
   bottomButtonContainer: {
     padding: 20,
-    // backgroundColor: bgColor,
   },
 });

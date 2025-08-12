@@ -1,19 +1,9 @@
 import React from 'react';
-import { Text, TextProps, StyleSheet } from 'react-native';
-// import useTheme from '../theme/useTheme';
+import { Text, StyleSheet } from 'react-native';
 
-interface CustomTextProps extends TextProps {
-  text?: string;
-  children?: React.ReactNode;
-  fontFamily?:
-    | 'Gilroy-Bold'
-    | 'Gilroy-ExtraBold'
-    | 'Gilroy-Medium'
-    | 'Gilroy-Regular'
-    | 'Gilroy-SemiBold';
-  size?: number;
-  color?: string;
-}
+import { textColor } from '../constants/colors';
+import { CustomTextProps } from '../types';
+// import useTheme from '../theme/useTheme';
 
 const CustomText: React.FC<CustomTextProps> = ({
   text,
@@ -34,7 +24,7 @@ const CustomText: React.FC<CustomTextProps> = ({
         {
           fontSize: size,
           fontFamily,
-          color: color || '#1F2024',
+          color: color || textColor,
         },
         style,
       ]}

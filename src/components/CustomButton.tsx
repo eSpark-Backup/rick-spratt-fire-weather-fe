@@ -1,31 +1,9 @@
 import React from 'react';
-import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  Image,
-  View,
-  ImageSourcePropType,
-  GestureResponderEvent,
-  ViewStyle,
-  TextStyle,
-  TouchableOpacityProps,
-} from 'react-native';
+import { TouchableOpacity, StyleSheet, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import CustomText from './CustomText';
 
-interface CustomButtonProps extends TouchableOpacityProps {
-  title: string;
-  onPress: (event: GestureResponderEvent) => void;
-  icon?: React.ReactNode;
-  backgroundColor?: string;
-  textColor?: string;
-  borderColor?: string;
-  borderWidth?: number;
-  style?: ViewStyle | ViewStyle[];
-  textStyle?: TextStyle;
-  gradient?: boolean;
-}
+import CustomText from './CustomText';
+import { CustomButtonProps } from '../types';
 
 const CustomButton: React.FC<CustomButtonProps> = ({
   title,

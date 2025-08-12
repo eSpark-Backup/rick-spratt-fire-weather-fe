@@ -12,6 +12,9 @@ import SettingsScreen from '../screens/Settings';
 import SignInScreen from '../screens/SignIn';
 import SignUpScreen from '../screens/SignUp';
 import { getActiveRouteName, navigationRef } from './RootNavigation';
+import Header from '../components/Header';
+import { zoneData } from '../constants';
+import CustomTabBar from '../components/CustomTabBar';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator();
@@ -20,9 +23,21 @@ function HomeTabs() {
   console.log('that mounted');
 
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      tabBar={props => <CustomTabBar {...props} />}
+      screenOptions={{
+        header: () => (
+          <Header
+            username="James"
+            locations={zoneData}
+            onLocationSelect={loc => console.log(loc)}
+          />
+        ),
+      }}
+    >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen name="Notifications" component={NotificationsScreen} />
     </Tab.Navigator>
   );
 }
@@ -42,8 +57,6 @@ function AppNavigator() {
         component={HomeTabs}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="Notifications" component={NotificationsScreen} />
-      <Stack.Screen name="HomeInner" component={HomeInnerScreen} />
     </Stack.Navigator>
   );
 }

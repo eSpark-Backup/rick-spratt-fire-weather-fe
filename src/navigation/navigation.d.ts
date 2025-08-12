@@ -6,8 +6,6 @@ export type RootStackParamList = {
   SignIn: undefined;
   SignUp: undefined;
   HomeTabs: undefined; // contains bottom tab
-  Notifications: undefined;
-  HomeInner: undefined; // no bottom tab
 };
 
 export type RootStackNavigationProp<
@@ -21,7 +19,7 @@ export type RootStackRouteProp<
 export type BottomTabParamList = {
   Home: undefined;
   Settings: undefined;
-  CloseApp: undefined;
+  Notifications: undefined;
 };
 
 export type BottomTabNavigationProp<

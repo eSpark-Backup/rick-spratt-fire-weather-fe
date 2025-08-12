@@ -1,10 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { TouchableOpacity, View, StyleSheet } from 'react-native';
-
-interface RadioButtonProps {
-  selected?: boolean;
-  onPress: () => void;
-}
+import { brdrColor } from '../constants/colors';
+import { RadioButtonProps } from '../types';
 
 const RadioButton: React.FC<RadioButtonProps> = ({ selected, onPress }) => {
   return (
@@ -29,7 +26,7 @@ const styles = StyleSheet.create({
     width: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#E0E0E0', // blue border
+    borderColor: brdrColor, // blue border
     justifyContent: 'center',
     alignItems: 'center',
   },

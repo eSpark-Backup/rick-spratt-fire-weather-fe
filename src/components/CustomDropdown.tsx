@@ -7,17 +7,12 @@ import {
   findNodeHandle,
   UIManager,
 } from 'react-native';
+
 import CustomText from './CustomText';
 import { ArrowDown, ArrowUp } from '../assets';
-import DropdownModal, { DropdownItem } from './DropdownModal';
-
-type Props = {
-  data: DropdownItem[];
-  placeholder?: string;
-  onSelect: (item: DropdownItem) => void;
-  selectedValue?: string;
-  maxHeight?: number;
-};
+import DropdownModal from './DropdownModal';
+import { brdrColor } from '../constants/colors';
+import { DropdownProps } from '../types';
 
 export default function CustomDropdown({
   data,
@@ -25,7 +20,9 @@ export default function CustomDropdown({
   onSelect,
   selectedValue,
   maxHeight,
-}: Props) {
+  error, // <-- new prop
+  hasError = false,
+}: DropdownProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [buttonLayout, setButtonLayout] = useState<LayoutRectangle | null>(
     null,
@@ -47,17 +44,23 @@ export default function CustomDropdown({
   const selectedItem = data.find(item => item.value === selectedValue);
 
   return (
-    <View>
+    <View style={styles.container}>
       <TouchableOpacity
         ref={buttonRef}
-        style={styles.dropdownButton}
+        style={[styles.dropdownButton, hasError && styles.dropdownError]}
         onPress={handleOpen}
       >
-        <CustomText>
+        <CustomText color={hasError ? '#E74C3C' : undefined}>
           {selectedItem ? selectedItem.label : placeholder}
         </CustomText>
         {isVisible ? <ArrowUp /> : <ArrowDown />}
       </TouchableOpacity>
+
+      {error && (
+        <CustomText style={styles.errorText} size={12}>
+          {error}
+        </CustomText>
+      )}
 
       <DropdownModal
         visible={isVisible}
@@ -81,14 +84,26 @@ export default function CustomDropdown({
 }
 
 const styles = StyleSheet.create({
+  container: {
+    marginBottom: 20,
+  },
   dropdownButton: {
     padding: 12,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: brdrColor,
     height: 57,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  dropdownError: {
+    borderColor: '#E74C3C',
+    backgroundColor: '#FFF5F5',
+  },
+  errorText: {
+    color: '#E74C3C',
+    marginTop: 4,
+    marginRight: 2,
   },
 });
