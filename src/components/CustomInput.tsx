@@ -1,24 +1,11 @@
 import React, { useState } from 'react';
-import {
-  View,
-  TextInput,
-  StyleSheet,
-  TextInputProps,
-  ViewStyle,
-  TouchableOpacity,
-} from 'react-native';
+import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+
 import CustomText from './CustomText';
 import { EyeClosed, EyeOpen } from '../assets';
 import { brdrColor, textColor } from '../constants/colors';
+import { CustomInputProps } from '../types';
 // import useTheme from '../theme/useTheme';
-
-interface CustomInputProps extends TextInputProps {
-  label?: string;
-  error?: string;
-  hasError?: boolean;
-  style?: ViewStyle;
-  bgColor?: string;
-}
 
 const CustomInput: React.FC<CustomInputProps> = ({
   label,

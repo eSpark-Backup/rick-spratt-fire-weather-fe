@@ -1,13 +1,6 @@
-import { StyleSheet, ViewStyle, TouchableOpacity } from 'react-native';
-import { coolColor, tempColor } from '../constants/colors';
-
-interface ColoredTileProps {
-  color: string;
-  children: React.ReactNode;
-  style?: ViewStyle;
-  activeOpacity?: number;
-  onPress?: () => void;
-}
+import { StyleSheet, TouchableOpacity } from 'react-native';
+import { coolColor } from '../constants/colors';
+import { ColoredTileProps } from '../types';
 
 const ColoredTile: React.FC<ColoredTileProps> = ({
   color = coolColor,

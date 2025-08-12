@@ -5,11 +5,7 @@ import CustomText from './CustomText';
 import { ActiveSettingsIcon, Logout, SettingsIcon } from '../assets';
 import { primaryColor } from '../constants/colors';
 import { getActiveRouteName } from '../navigation/RootNavigation';
-
-interface CustomTabBarProps {
-  navigation: any;
-  state: any;
-}
+import { CustomTabBarProps } from '../types';
 
 const TABS = [
   {
@@ -45,7 +41,7 @@ const CustomTabBar: React.FC<CustomTabBarProps> = ({ navigation, state }) => {
             : icon;
 
         const onPress = () => {
-          if (!isFocused) {
+          if (currentScreen !== navigateTo) {
             navigation.navigate(navigateTo);
           }
         };

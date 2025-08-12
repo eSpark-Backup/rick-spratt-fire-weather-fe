@@ -5,26 +5,11 @@ import {
   Modal,
   FlatList,
   StyleSheet,
-  DimensionValue,
 } from 'react-native';
+
 import CustomText from './CustomText';
 import { CheckIcon } from '../assets';
-
-export type DropdownItem = {
-  label: string;
-  value: string;
-};
-
-type Props = {
-  visible: boolean;
-  onClose: () => void;
-  data: DropdownItem[];
-  selectedValue?: string;
-  onSelect: (item: DropdownItem) => void;
-  position?: { top: number; left: number; width: number };
-  maxHeight?: number;
-  width?: DimensionValue;
-};
+import { DropdownModalProps } from '../types';
 
 export default function DropdownModal({
   visible,
@@ -35,7 +20,7 @@ export default function DropdownModal({
   position,
   maxHeight = 400,
   width,
-}: Props) {
+}: DropdownModalProps) {
   return (
     <Modal
       visible={visible}

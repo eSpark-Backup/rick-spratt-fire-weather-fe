@@ -1,16 +1,9 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+
 import CustomText from './CustomText';
 import ColoredTile from './ColoredTIle';
-import { labelColor, timeColor } from '../constants/colors';
-import { ChevronRight } from '../assets';
-
-interface NotificationTileProps {
-  icon: React.ReactNode;
-  message: string;
-  time: string;
-  color?: string;
-  onPress?: () => void;
-}
+import { timeColor } from '../constants/colors';
+import { NotificationTileProps } from '../types';
 
 const NotificationTile: React.FC<NotificationTileProps> = ({
   icon,
@@ -32,7 +25,7 @@ const NotificationTile: React.FC<NotificationTileProps> = ({
           </CustomText>
         </View>
       </View>
-      <ChevronRight width={16} height={16} />
+      {/* <ChevronRight width={16} height={16} /> */}
     </ColoredTile>
   );
 };

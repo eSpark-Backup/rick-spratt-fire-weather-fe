@@ -1,15 +1,8 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+
 import CustomText from './CustomText';
 import ColoredTile from './ColoredTIle';
-
-interface CustomTileProps {
-  icon: React.ReactNode;
-  title: string;
-  rightValue: string;
-  color?: string;
-  activeOpacity?: number;
-  onPress?: () => void;
-}
+import { CustomTileProps } from '../types';
 
 const CustomTile: React.FC<CustomTileProps> = ({
   icon,

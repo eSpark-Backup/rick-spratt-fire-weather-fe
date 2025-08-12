@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
-import DropdownModal, { DropdownItem } from './DropdownModal';
+import DropdownModal from './DropdownModal';
 import {
   ArrowDown,
   ArrowUp,
@@ -20,17 +20,7 @@ import CustomText from './CustomText';
 import { BottomTabNavigationProp } from '../navigation/navigation';
 import { selectedCountry, selectedState } from '../constants';
 import { labelColor } from '../constants/colors';
-
-interface HeaderProps {
-  username: string;
-  locations: {
-    label: string;
-    value: string;
-  }[];
-  onLocationSelect: (location: string) => void;
-  LeftIcon?: React.ReactNode;
-  onLeftPress?: () => void;
-}
+import { DropdownItem, HeaderProps } from '../types';
 
 const Header: React.FC<HeaderProps> = ({
   username,

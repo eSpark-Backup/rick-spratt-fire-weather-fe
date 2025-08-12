@@ -7,18 +7,12 @@ import {
   findNodeHandle,
   UIManager,
 } from 'react-native';
+
 import CustomText from './CustomText';
 import { ArrowDown, ArrowUp } from '../assets';
-import DropdownModal, { DropdownItem } from './DropdownModal';
+import DropdownModal from './DropdownModal';
 import { brdrColor } from '../constants/colors';
-
-type Props = {
-  data: DropdownItem[];
-  placeholder?: string;
-  onSelect: (item: DropdownItem) => void;
-  selectedValue?: string;
-  maxHeight?: number;
-};
+import { DropdownProps } from '../types';
 
 export default function CustomDropdown({
   data,
@@ -26,7 +20,7 @@ export default function CustomDropdown({
   onSelect,
   selectedValue,
   maxHeight,
-}: Props) {
+}: DropdownProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [buttonLayout, setButtonLayout] = useState<LayoutRectangle | null>(
     null,

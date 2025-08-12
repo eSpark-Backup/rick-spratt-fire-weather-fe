@@ -1,16 +1,13 @@
 import React from 'react';
 import { View, Modal, StyleSheet, TouchableOpacity } from 'react-native';
+
 import CustomText from './CustomText';
 import CustomButton from './CustomButton';
 import { BlueCirleTick } from '../assets';
 import { bgColor } from '../constants/colors';
+import { SuccessModalProps } from '../types';
 
-type Props = {
-  visible: boolean;
-  onGoHome: () => void;
-};
-
-export default function SuccessModal({ visible, onGoHome }: Props) {
+export default function SuccessModal({ visible, onGoHome }: SuccessModalProps) {
   return (
     <Modal visible={visible} transparent animationType="fade">
       <TouchableOpacity style={styles.overlay} activeOpacity={1}>

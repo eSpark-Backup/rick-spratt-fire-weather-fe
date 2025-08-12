@@ -6,6 +6,7 @@ import CustomButton from '../../components/CustomButton';
 import SettingsEditModal from '../../components/SettingsEditModal';
 import { CloudHot, Droplet, Flag, PlantKBDI, Wind } from '../../assets';
 import { bgColor, tempColor } from '../../constants/colors';
+import { Setting, KBDISetting, ValueSetting } from '../../types';
 
 const WIND_DIRECTIONS = ['South', 'North', 'West', 'East'];
 
@@ -13,7 +14,7 @@ export default function SettingsScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSetting, setSelectedSetting] = useState(null);
 
-  const [settings, setSettings] = useState([
+  const [settings, setSettings] = useState<Setting[]>([
     {
       icon: <CloudHot />,
       title: 'Set Temperature',
@@ -66,6 +67,54 @@ export default function SettingsScreen() {
     setModalVisible(true);
   };
 
+  const handleValueChange = (
+    key: string,
+    value: number | { min: number; max: number },
+  ) => {
+    setSettings(prev =>
+      prev.map(item => {
+        if (item.key === key) {
+          if (key === 'kbdi' && typeof value === 'object') {
+            return {
+              ...item,
+              minValue: value.min,
+              maxValue: value.max,
+              rightValue: `${value.min}-${value.max}`,
+              value: undefined,
+            } as KBDISetting;
+          }
+          return {
+            ...item,
+            value: value as number,
+            rightValue:
+              key === 'temperature'
+                ? `${value}°C`
+                : key === 'humidity'
+                ? `${value}%`
+                : key === 'windSpeed'
+                ? `${value} mph`
+                : `${value}`,
+            minValue: undefined,
+            maxValue: undefined,
+          } as ValueSetting;
+        }
+        return item;
+      }),
+    );
+
+    setWindDirections(prev =>
+      prev.map(item =>
+        item.key === key
+          ? {
+              ...item,
+              value: value as number,
+              rightValue: `Above ${value}`,
+            }
+          : item,
+      ),
+    );
+  };
+
   const handleSetThreshold = () => {};
 
   return (
@@ -103,6 +152,7 @@ export default function SettingsScreen() {
         visible={modalVisible}
         setting={selectedSetting}
         onClose={() => setModalVisible(false)}
+        onValueChange={handleValueChange}
       />
     </SafeAreaView>
   );

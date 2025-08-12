@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
+
 import { RootStackNavigationProp } from '../../navigation/navigation';
 import CustomText from '../../components/CustomText';
 import CustomButton from '../../components/CustomButton';
@@ -18,7 +19,6 @@ type Props = { navigation: RootStackNavigationProp<'SignIn'> };
 
 export default function SignInScreen({ navigation }: Props) {
   const [selected, setSelected] = useState(false);
-  const [visible, setVisible] = useState(false);
 
   const handleLogin = () => {
     navigation.replace('HomeTabs');
@@ -53,8 +53,6 @@ export default function SignInScreen({ navigation }: Props) {
           label="Password"
           placeholder="Enter your password"
           secureTextEntry
-          // visible={visible}
-          // onPress={() => setVisible(!visible)}
         />
 
         <View style={styles.rememberMeContainer}>

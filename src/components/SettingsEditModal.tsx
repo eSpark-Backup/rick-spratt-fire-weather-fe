@@ -6,36 +6,18 @@ import {
   TouchableOpacity,
   TextInput,
 } from 'react-native';
+
 import CustomText from './CustomText';
 import { ChevronUp, ChevronDown } from '../assets';
 import { bgColor, coolColor } from '../constants/colors';
-
-type Setting = {
-  icon: React.ReactNode;
-  title: string;
-  rightValue?: string;
-  value: number;
-  minValue?: number;
-  maxValue?: number;
-  key: string;
-};
-
-type Props = {
-  visible: boolean;
-  setting: Setting | null;
-  onClose: () => void;
-  onValueChange?: (
-    key: string,
-    value: number | { min: number; max: number },
-  ) => void;
-};
+import { SettingsEditModalProps } from '../types';
 
 export default function SettingsEditModal({
   visible,
   setting,
   onClose,
   onValueChange,
-}: Props) {
+}: SettingsEditModalProps) {
   const [inputValue, setInputValue] = useState<string>('');
   const [minValue, setMinValue] = useState<string>('');
   const [maxValue, setMaxValue] = useState<string>('');

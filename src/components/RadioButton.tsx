@@ -1,11 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { TouchableOpacity, View, StyleSheet } from 'react-native';
 import { brdrColor } from '../constants/colors';
-
-interface RadioButtonProps {
-  selected?: boolean;
-  onPress: () => void;
-}
+import { RadioButtonProps } from '../types';
 
 const RadioButton: React.FC<RadioButtonProps> = ({ selected, onPress }) => {
   return (
