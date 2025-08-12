@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   StyleSheet,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 
 import { RootStackNavigationProp } from '../../navigation/navigation';
@@ -18,24 +19,45 @@ import { bgColor } from '../../constants/colors';
 type Props = { navigation: RootStackNavigationProp<'SignIn'> };
 
 export default function SignInScreen({ navigation }: Props) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [selected, setSelected] = useState(false);
 
+  const validateEmail = (value: string) => {
+    if (!value) return 'Email is required';
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(value)) return 'Enter a valid email';
+    return '';
+  };
+
+  const validatePassword = (value: string) => {
+    if (!value) return 'Password is required';
+    if (value.length < 6) return 'Password must be at least 6 characters';
+    return '';
+  };
+
   const handleLogin = () => {
-    navigation.replace('HomeTabs');
+    const emailErr = validateEmail(email);
+    const passErr = validatePassword(password);
+
+    setEmailError(emailErr);
+    setPasswordError(passErr);
+
+    if (!emailErr && !passErr) {
+      navigation.replace('HomeTabs');
+    }
   };
 
   const handleSignUp = () => {
     navigation.navigate('SignUp');
   };
 
+  const isFormValid = !validateEmail(email) && !validatePassword(password);
+
   return (
-    <SafeAreaView
-      style={[
-        styles.container,
-        // { backgroundColor: theme.colors.background }
-        // { backgroundColor: '#fff' },
-      ]}
-    >
+    <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
@@ -48,11 +70,24 @@ export default function SignInScreen({ navigation }: Props) {
           label="Email Address"
           placeholder="Enter your email address"
           keyboardType="email-address"
+          value={email}
+          onChangeText={text => {
+            setEmail(text);
+            if (emailError) setEmailError(validateEmail(text));
+          }}
+          error={emailError} // assuming CustomInput can show error text
         />
+
         <CustomInput
           label="Password"
           placeholder="Enter your password"
           secureTextEntry
+          value={password}
+          onChangeText={text => {
+            setPassword(text);
+            if (passwordError) setPasswordError(validatePassword(text));
+          }}
+          error={passwordError}
         />
 
         <View style={styles.rememberMeContainer}>
@@ -70,14 +105,11 @@ export default function SignInScreen({ navigation }: Props) {
             title="Login"
             onPress={handleLogin}
             textStyle={styles.loginButtonText}
+            disabled={!isFormValid}
           />
 
           <View style={styles.linkContainer}>
-            <CustomText
-            // color={theme.dark ? '#999' : '#666'}
-            >
-              Don’t have an account?
-            </CustomText>
+            <CustomText>Don’t have an account?</CustomText>
             <TouchableOpacity onPress={handleSignUp}>
               <CustomText style={styles.link}> Sign Up</CustomText>
             </TouchableOpacity>

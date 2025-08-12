@@ -57,6 +57,8 @@ export type DropdownProps = {
   onSelect: (item: DropdownItem) => void;
   selectedValue?: string;
   maxHeight?: number;
+  error?: string;
+  hasError?: boolean;
 };
 
 export interface CustomInputProps extends TextInputProps {
