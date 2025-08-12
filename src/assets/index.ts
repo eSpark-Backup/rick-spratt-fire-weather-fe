@@ -10,3 +10,4 @@ export { default as SettingsIcon } from './svgs/settings-icon.svg';
 export { default as EyeOpen } from './svgs/eyeOpen.svg';
 export { default as EyeClosed } from './svgs/eyeClosed.svg';
 export { default as CheckIcon } from './svgs/check.svg';
+export { default as Logout } from './svgs/logout.svg';

@@ -173,7 +173,6 @@ export default function SignUpScreen({ navigation }: Props) {
           </View>
           <SuccessModal
             visible={isSuccessModalVisible}
-            onClose={() => setSuccessModalVisible(false)}
             onGoHome={() => {
               setSuccessModalVisible(false);
               navigation.navigate('HomeTabs');
