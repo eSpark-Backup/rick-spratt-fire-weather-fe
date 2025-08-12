@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, TextProps, StyleSheet } from 'react-native';
+import { textColor } from '../constants/colors';
 // import useTheme from '../theme/useTheme';
 
 interface CustomTextProps extends TextProps {
@@ -34,7 +35,7 @@ const CustomText: React.FC<CustomTextProps> = ({
         {
           fontSize: size,
           fontFamily,
-          color: color || '#1F2024',
+          color: color || textColor,
         },
         style,
       ]}

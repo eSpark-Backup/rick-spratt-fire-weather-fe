@@ -10,6 +10,7 @@ import {
 import CustomText from './CustomText';
 import { ArrowDown, ArrowUp } from '../assets';
 import DropdownModal, { DropdownItem } from './DropdownModal';
+import { brdrColor } from '../constants/colors';
 
 type Props = {
   data: DropdownItem[];
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: brdrColor,
     height: 57,
     alignItems: 'center',
     flexDirection: 'row',

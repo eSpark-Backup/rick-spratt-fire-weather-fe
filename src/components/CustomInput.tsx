@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import CustomText from './CustomText';
 import { EyeClosed, EyeOpen } from '../assets';
+import { brdrColor, textColor } from '../constants/colors';
 // import useTheme from '../theme/useTheme';
 
 interface CustomInputProps extends TextInputProps {
@@ -49,7 +50,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
           styles.inputContainer,
           props.multiline && styles.inputContainerMultiline,
           hasError && styles.inputError,
-          { backgroundColor: bgColor, borderColor: '#E0E0E0' },
+          { backgroundColor: bgColor, borderColor: brdrColor },
           style,
         ]}
       >
@@ -59,7 +60,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
             props.multiline && styles.multilineInput,
             hasError && styles.inputTextError,
             {
-              color: '#333',
+              color: textColor,
               // color: theme.dark ? '#efefef' : '#333',
               fontFamily: 'Gilroy-Medium',
               fontSize: 16,

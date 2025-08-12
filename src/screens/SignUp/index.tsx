@@ -14,6 +14,7 @@ import CustomButton from '../../components/CustomButton';
 import CustomDropdown from '../../components/CustomDropdown';
 import { bgColor } from '../../constants/colors';
 import { zoneData } from '../../constants';
+import SuccessModal from '../../components/SuccessModal';
 
 type Props = { navigation: RootStackNavigationProp<'SignUp'> };
 
@@ -29,6 +30,7 @@ export default function SignUpScreen({ navigation }: Props) {
   const [state, setState] = useState('');
 
   const [selectedZone, setSelectedZone] = useState<string | undefined>();
+  const [isSuccessModalVisible, setSuccessModalVisible] = useState(false);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -161,13 +163,22 @@ export default function SignUpScreen({ navigation }: Props) {
                     if (step === 1) {
                       setStep(2);
                     } else {
-                      navigation.navigate('HomeTabs');
+                      setSuccessModalVisible(true);
+                      // navigation.navigate('HomeTabs');
                     }
                   }}
                 />
               </View>
             </View>
           </View>
+          <SuccessModal
+            visible={isSuccessModalVisible}
+            onClose={() => setSuccessModalVisible(false)}
+            onGoHome={() => {
+              setSuccessModalVisible(false);
+              navigation.navigate('HomeTabs');
+            }}
+          />
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
