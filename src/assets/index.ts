@@ -1,0 +1,12 @@
+export { default as BackIcon } from './svgs/back.svg';
+export { default as GoogleIcon } from './svgs/google-icon.svg';
+export { default as ArrowDown } from './svgs/arrow-down.svg';
+export { default as ArrowUp } from './svgs/arrow-up.svg';
+export { default as BellIcon } from './svgs/bell-icon-circle.svg';
+export { default as BlueCirleTick } from './svgs/blue-tick0circle.svg';
+export { default as ChevronRight } from './svgs/chevron-right.svg';
+export { default as LocationIcon } from './svgs/location.svg';
+export { default as SettingsIcon } from './svgs/settings-icon.svg';
+export { default as EyeOpen } from './svgs/eyeOpen.svg';
+export { default as EyeClosed } from './svgs/eyeClosed.svg';
+export { default as CheckIcon } from './svgs/check.svg';
