@@ -2,33 +2,47 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 
 import CustomText from './CustomText';
-import { Logout, SettingsIcon } from '../assets';
+import { ActiveSettingsIcon, Logout, SettingsIcon } from '../assets';
+import { primaryColor } from '../constants/colors';
+import { getActiveRouteName } from '../navigation/RootNavigation';
 
 interface CustomTabBarProps {
   navigation: any;
-  state: any; // you can add better typing here if you want
+  state: any;
 }
 
+const TABS = [
+  {
+    key: 'CloseApp',
+    label: 'Close App',
+    icon: <Logout height={24} width={24} />,
+    navigateTo: 'SignIn',
+  },
+  {
+    key: 'Settings',
+    label: 'Settings',
+    icon: (active: boolean) =>
+      active ? (
+        <ActiveSettingsIcon height={28} width={28} />
+      ) : (
+        <SettingsIcon height={28} width={28} />
+      ),
+    navigateTo: 'Settings',
+  },
+];
+
 const CustomTabBar: React.FC<CustomTabBarProps> = ({ navigation, state }) => {
-  const tabs = [
-    {
-      key: 'CloseApp',
-      label: 'Close App',
-      icon: <Logout height={24} width={24} />,
-      navigateTo: 'SignIn',
-    },
-    {
-      key: 'Settings',
-      label: 'Settings',
-      icon: <SettingsIcon height={28} width={28} />,
-      navigateTo: 'Settings',
-    },
-  ];
+  const currentScreen = getActiveRouteName();
 
   return (
     <View style={styles.container}>
-      {tabs.map(({ key, label, icon, navigateTo }, index) => {
+      {TABS.map(({ key, label, icon, navigateTo }, index) => {
         const isFocused = state.index === index;
+        const isSettings = label === 'Settings';
+        const tabIcon =
+          typeof icon === 'function'
+            ? icon(currentScreen === 'Settings')
+            : icon;
 
         const onPress = () => {
           if (!isFocused) {
@@ -45,11 +59,13 @@ const CustomTabBar: React.FC<CustomTabBarProps> = ({ navigation, state }) => {
             style={styles.tabButton}
             activeOpacity={0.8}
           >
-            <View style={styles.iconWrapper}>{icon}</View>
+            <View style={styles.iconWrapper}>{tabIcon}</View>
             <CustomText
               style={[
                 styles.label,
-                isFocused ? styles.activeLabel : styles.inactiveLabel,
+                isFocused && isSettings
+                  ? styles.activeLabel
+                  : styles.inactiveLabel,
               ]}
               size={12}
             >
@@ -83,7 +99,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   activeLabel: {
-    color: '#005BBC',
+    color: primaryColor,
   },
   inactiveLabel: {
     color: '#555555',
