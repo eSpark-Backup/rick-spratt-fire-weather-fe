@@ -4,7 +4,7 @@ import { RootStackNavigationProp } from '../../navigation/navigation';
 import CustomTile from '../../components/CustomTile';
 import ColoredTile from '../../components/ColoredTIle';
 import CustomText from '../../components/CustomText';
-import { CloudHot, Droplet, Wind, PlantKBDI } from '../../assets';
+import { CloudHot, Droplet, Wind, PlantKBDI, Flag } from '../../assets';
 import { bgColor, tempColor } from '../../constants/colors';
 
 type Props = { navigation: RootStackNavigationProp<'HomeTabs'> };
@@ -31,9 +31,14 @@ const TILES = [
     title: 'KBDI',
     rightValue: '150-500',
   },
+  {
+    icon: <Flag />,
+    title: 'Wind Direction',
+    rightValue: 'Above 75',
+  },
 ];
 
-const COMMENT = 'Conditions within burn thresholds';
+const COMMENT = 'Prescribed Conditions';
 
 export default function HomeScreen({ navigation }: Props) {
   return (

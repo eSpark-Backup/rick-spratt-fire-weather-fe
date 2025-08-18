@@ -145,7 +145,7 @@ export default function SettingsScreen() {
           />
         ))}
 
-        <CustomButton title="Set Thresholds" onPress={() => {}} />
+        <CustomButton title="Set Prescribed" onPress={() => {}} />
       </ScrollView>
 
       <SettingsEditModal

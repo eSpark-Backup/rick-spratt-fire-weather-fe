@@ -146,17 +146,15 @@ export default function SignUpScreen({ navigation }: Props) {
                 />
                 <CustomInput
                   label="Country"
-                  placeholder="Enter your country"
-                  value={country}
-                  onChangeText={setCountry}
-                  error={errors.country}
+                  placeholder="US"
+                  value={'US'}
+                  editable={false}
                 />
                 <CustomInput
                   label="State"
-                  placeholder="Enter your state"
-                  value={state}
-                  onChangeText={setState}
-                  error={errors.state}
+                  placeholder="Florida"
+                  value={'Florida'}
+                  editable={false}
                 />
               </>
             )}
