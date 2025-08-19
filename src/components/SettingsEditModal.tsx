@@ -273,6 +273,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     fontSize: 16,
     color: '#333',
+    fontFamily: 'Gilroy-Medium',
   },
   arrowButtons: {
     flexDirection: 'row',
