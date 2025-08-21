@@ -16,10 +16,11 @@ import CustomInput from '../../components/CustomInput';
 import RadioButton from '../../components/RadioButton';
 import { bgColor } from '../../constants/colors';
 
-import { login } from '../../services/authService';
+import { login, updateDeviceToken } from '../../services/authService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch } from 'react-redux';
 import { setIsLoggedIn, setUser } from '../../redux/slices/authSlice';
+import getDeviceToken from '../../utils/getDeviceToken';
 
 type Props = { navigation: RootStackNavigationProp<'SignIn'> };
 
@@ -60,8 +61,10 @@ export default function SignInScreen({ navigation }: Props) {
         if (response.success) {
           const userData = response.data; // full user + token
           const { token } = userData;
+          const fcmToken = await getDeviceToken();
 
           // Save token to storage
+          await updateDeviceToken(fcmToken);
           await AsyncStorage.setItem('authToken', token);
 
           // Update Redux

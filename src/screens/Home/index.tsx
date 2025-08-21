@@ -40,7 +40,13 @@ export default function HomeScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.container}>
-      {loading && <ActivityIndicator size="large" color={tempColor} />}
+      {loading && (
+        <ActivityIndicator
+          size="large"
+          color={tempColor}
+          style={{ marginBottom: '7%' }}
+        />
+      )}
 
       {latest && (
         <>

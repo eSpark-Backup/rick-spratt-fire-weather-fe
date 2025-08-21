@@ -31,6 +31,13 @@ export const signup = async (payload: SignupPayload) => {
   return response.data;
 };
 
+export const updateDeviceToken = async (deviceToken: string) => {
+  const response = await api.patch('/auth/device-token', {
+    deviceToken,
+  });
+  return response.data;
+};
+
 // export const forgotPassword = async (payload: forgotPassPayload) => {
 //   const response = await api.post('/users/forgot-password', payload);
 //   return response.data;
