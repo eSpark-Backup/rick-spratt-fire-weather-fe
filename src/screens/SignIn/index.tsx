@@ -61,7 +61,9 @@ export default function SignInScreen({ navigation }: Props) {
           const { token, firstName } = response.data;
 
           await AsyncStorage.setItem('authToken', token);
+          await AsyncStorage.setItem('isUserLoggedIn', 'true');
           dispatch(setIsLoggedIn(true));
+          console.log('isLoggedIn', true);
           // dispatch(setUser(user));
           navigation.replace('HomeTabs');
         } else {

@@ -1,29 +1,55 @@
-import React from 'react';
-import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
-import NotificationTile from '../../components/NotificationTile';
-import { CloudCool } from '../../assets';
-import { bgColor } from '../../constants/colors';
+import React, { useEffect } from 'react';
+import {
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator,
+  View,
+} from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 
-const notifications = Array.from({ length: 9 }, (_, i) => ({
-  id: i,
-  icon: <CloudCool />,
-  message: 'Lorem Ipsum is simply dummy text of the printing',
-  time: '10 minutes ago',
-}));
+import NotificationTile from '../../components/NotificationTile';
+import { bgColor, primaryColor } from '../../constants/colors';
+import { AppDispatch, RootState } from '../../redux/store';
+import { fetchAllNotifications } from '../../services/notificationService'; // 👈 where your thunk lives
+import CustomText from '../../components/CustomText';
+import { CloudCool } from '../../assets';
 
 export default function NotificationsScreen() {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { notifications, loading, error } = useSelector(
+    (state: RootState) => state.notification,
+  );
+
+  useEffect(() => {
+    dispatch(fetchAllNotifications());
+  }, [dispatch]);
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        {notifications.map(({ id, icon, message, time }) => (
-          <NotificationTile
-            key={id}
-            icon={icon}
-            message={message}
-            time={time}
-          />
-        ))}
-      </ScrollView>
+      {loading ? (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={primaryColor} />
+        </View>
+      ) : error ? (
+        <View style={styles.center}>
+          <CustomText size={14} color="red">
+            {error}
+          </CustomText>
+        </View>
+      ) : (
+        <ScrollView contentContainerStyle={styles.scrollViewContent}>
+          {notifications.map(({ id, icon, body, createdAt }) => (
+            <NotificationTile
+              key={id}
+              icon={icon?? <CloudCool />}
+              message={body || ''}
+              time={createdAt || ''}
+            />
+          ))}
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
@@ -36,5 +62,10 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     paddingHorizontal: 12,
     flexGrow: 1,
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
