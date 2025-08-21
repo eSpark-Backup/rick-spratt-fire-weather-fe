@@ -58,11 +58,15 @@ export default function SignInScreen({ navigation }: Props) {
         const response = await login({ email, password });
 
         if (response.success) {
-          const { token, firstName } = response.data;
+          const userData = response.data; // full user + token
+          const { token } = userData;
 
+          // Save token to storage
           await AsyncStorage.setItem('authToken', token);
+
+          // Update Redux
           dispatch(setIsLoggedIn(true));
-          // dispatch(setUser(user));
+          dispatch(setUser(userData));
           navigation.replace('HomeTabs');
         } else {
           Alert.alert(
