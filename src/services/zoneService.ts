@@ -43,3 +43,8 @@ export const fetchZones = async (
 
   return response.data.data.zones;
 };
+// Update zone for logged-in user
+export const updateZone = async (zoneId: string) => {
+  const response = await api.patch('/auth/zone', { zoneId });
+  return response.data;
+};

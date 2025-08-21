@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -21,6 +21,7 @@ import { BottomTabNavigationProp } from '../navigation/navigation';
 import { selectedCountry, selectedState } from '../constants';
 import { labelColor } from '../constants/colors';
 import { DropdownItem, HeaderProps } from '../types';
+import { Zone, fetchZones, updateZone } from '../services/zoneService';
 
 const Header: React.FC<HeaderProps> = ({
   username,
@@ -41,6 +42,25 @@ const Header: React.FC<HeaderProps> = ({
     left: number;
     width: number;
   } | null>(null);
+  const [zones, setZones] = useState<Zone[]>([]);
+  const [loadingZones, setLoadingZones] = useState(false);
+
+  const loadZones = async () => {
+    setLoadingZones(true);
+    try {
+      const fetchedZones = await fetchZones('FL', 'fire');
+      console.log(zones);
+
+      setZones(fetchedZones);
+    } catch (error) {
+      console.error('Error fetching zones:', error);
+    } finally {
+      setLoadingZones(false);
+    }
+  };
+  useEffect(() => {
+    loadZones();
+  }, []);
 
   const locationRef = useRef<View>(null);
 
@@ -66,10 +86,17 @@ const Header: React.FC<HeaderProps> = ({
     }
   };
 
-  const handleSelectLocation = (item: DropdownItem) => {
+  const handleSelectLocation = async (item: DropdownItem) => {
     setSelectedLocation(item);
     onLocationSelect(item.value);
     setModalVisible(false);
+
+    try {
+      const res = await updateZone(item.value); // call API with selected zoneId
+      console.log('Zone updated:', res);
+    } catch (err) {
+      console.error('Error updating zone:', err);
+    }
   };
 
   // Prepare dropdown data from locations array
@@ -141,7 +168,7 @@ const Header: React.FC<HeaderProps> = ({
       <DropdownModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        data={dropdownData}
+        data={zones.map(z => ({ label: z.name, value: z.id }))}
         selectedValue={selectedLocation.value}
         onSelect={handleSelectLocation}
         position={dropdownPosition ?? undefined}
