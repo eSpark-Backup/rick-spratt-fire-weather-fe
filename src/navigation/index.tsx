@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
@@ -14,6 +14,8 @@ import { getActiveRouteName, navigationRef } from './RootNavigation';
 import Header from '../components/Header';
 import { zoneData } from '../constants';
 import CustomTabBar from '../components/CustomTabBar';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator();
@@ -43,10 +45,25 @@ function HomeTabs() {
 
 function AppNavigator() {
   console.log('this mounted');
+  const { isLoggedIn } = useSelector((state: RootState) => state.auth);
+ const [initialRoute, setInitialRoute] = useState<
+    keyof RootStackParamList | null
+  >(null);
 
+  useEffect(() => {
+    checkToken();
+  }, []);
+
+  const checkToken = async () => {
+    try {
+      setInitialRoute(isLoggedIn ? 'HomeTabs' : 'SignIn');
+    } catch (e) {
+      setInitialRoute('SignIn');
+    } 
+  };
   return (
     <Stack.Navigator
-      initialRouteName="SignIn"
+      initialRouteName={initialRoute || 'SignIn'}
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name="SignIn" component={SignInScreen} />
