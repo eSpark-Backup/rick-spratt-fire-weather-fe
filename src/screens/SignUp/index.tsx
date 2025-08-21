@@ -20,6 +20,8 @@ import SuccessModal from '../../components/SuccessModal';
 import { signup } from '../../services/authService';
 import getDeviceToken from '../../utils/getDeviceToken';
 import { fetchZones, Zone } from '../../services/zoneService';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../redux/slices/authSlice';
 
 type Props = { navigation: RootStackNavigationProp<'SignUp'> };
 
@@ -57,7 +59,7 @@ export default function SignUpScreen({ navigation }: Props) {
 
   // Error state
   const [errors, setErrors] = useState<Record<string, string>>({});
-
+  const dispatch = useDispatch();
   // Modal state
   const [isSuccessModalVisible, setSuccessModalVisible] = useState(false);
 
@@ -111,8 +113,7 @@ export default function SignUpScreen({ navigation }: Props) {
           if (res.success) {
             // Save token for future requests
             await AsyncStorage.setItem('authToken', res.data.token);
-
-            // Show success modal
+          // dispatch(setUser(user));
             setSuccessModalVisible(true);
           } else {
             setErrors({ api: res.message || 'Signup failed' });
