@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   KeyboardAvoidingView,
@@ -24,6 +24,8 @@ import getDeviceToken from '../../utils/getDeviceToken';
 
 type Props = { navigation: RootStackNavigationProp<'SignIn'> };
 
+const CREDENTIALS_KEY = 'rememberedUser';
+
 export default function SignInScreen({ navigation }: Props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,6 +34,19 @@ export default function SignInScreen({ navigation }: Props) {
   const [selected, setSelected] = useState(false);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+
+  const loadRememberedCredentials = async () => {
+    const saved = await AsyncStorage.getItem(CREDENTIALS_KEY);
+    if (saved) {
+      const { email, password } = JSON.parse(saved);
+      setEmail(email);
+      setPassword(password);
+      setSelected(true); // toggle Remember Me
+    }
+  };
+  useEffect(() => {
+    loadRememberedCredentials();
+  }, []);
 
   const validateEmail = (value: string) => {
     if (!value) return 'Email is required';
@@ -66,6 +81,16 @@ export default function SignInScreen({ navigation }: Props) {
           // Save token to storage
           await updateDeviceToken(fcmToken);
           await AsyncStorage.setItem('authToken', token);
+
+          // Save credentials if Remember Me selected
+          if (selected) {
+            await AsyncStorage.setItem(
+              CREDENTIALS_KEY,
+              JSON.stringify({ email, password }),
+            );
+          } else {
+            await AsyncStorage.removeItem(CREDENTIALS_KEY);
+          }
 
           // Update Redux
           dispatch(setIsLoggedIn(true));
