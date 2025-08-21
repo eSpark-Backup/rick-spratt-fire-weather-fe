@@ -6,7 +6,6 @@ import { SafeAreaView, StyleSheet } from 'react-native';
 
 import { RootStackParamList } from './navigation';
 import HomeScreen from '../screens/Home';
-import HomeInnerScreen from '../screens/HomeInner';
 import NotificationsScreen from '../screens/Notification';
 import SettingsScreen from '../screens/Settings';
 import SignInScreen from '../screens/SignIn';
