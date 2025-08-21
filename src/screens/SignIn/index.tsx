@@ -16,6 +16,9 @@ import CustomInput from '../../components/CustomInput';
 import RadioButton from '../../components/RadioButton';
 import { bgColor } from '../../constants/colors';
 
+import { login } from '../../services/authService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 type Props = { navigation: RootStackNavigationProp<'SignIn'> };
 
 export default function SignInScreen({ navigation }: Props) {
@@ -24,6 +27,7 @@ export default function SignInScreen({ navigation }: Props) {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [selected, setSelected] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const validateEmail = (value: string) => {
     if (!value) return 'Email is required';
@@ -34,11 +38,11 @@ export default function SignInScreen({ navigation }: Props) {
 
   const validatePassword = (value: string) => {
     if (!value) return 'Password is required';
-    if (value.length < 6) return 'Password must be at least 6 characters';
+    if (value.length < 8) return 'Password must be at least 8 characters';
     return '';
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     const emailErr = validateEmail(email);
     const passErr = validatePassword(password);
 
@@ -46,7 +50,31 @@ export default function SignInScreen({ navigation }: Props) {
     setPasswordError(passErr);
 
     if (!emailErr && !passErr) {
-      navigation.replace('HomeTabs');
+      try {
+        setLoading(true);
+        const response = await login({ email, password });
+
+        if (response.success) {
+          const { token, firstName } = response.data;
+
+          // Save token to AsyncStorage for later API calls
+          await AsyncStorage.setItem('authToken', token);
+
+          navigation.replace('HomeTabs');
+        } else {
+          Alert.alert(
+            'Login Failed',
+            response.message || 'Something went wrong',
+          );
+        }
+      } catch (error: any) {
+        Alert.alert(
+          'Login Failed',
+          error?.message || 'Invalid credentials. Please try again.',
+        );
+      } finally {
+        setLoading(false);
+      }
     }
   };
 

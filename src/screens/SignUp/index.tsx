@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   KeyboardAvoidingView,
@@ -7,6 +7,8 @@ import {
   View,
   StyleSheet,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import CustomText from '../../components/CustomText';
 import CustomInput from '../../components/CustomInput';
 import { RootStackNavigationProp } from '../../navigation/navigation';
@@ -15,6 +17,9 @@ import CustomDropdown from '../../components/CustomDropdown';
 import { bgColor } from '../../constants/colors';
 import { zoneData } from '../../constants';
 import SuccessModal from '../../components/SuccessModal';
+import { signup } from '../../services/authService';
+import getDeviceToken from '../../utils/getDeviceToken';
+import { fetchZones, Zone } from '../../services/zoneService';
 
 type Props = { navigation: RootStackNavigationProp<'SignUp'> };
 
@@ -26,9 +31,29 @@ export default function SignUpScreen({ navigation }: Props) {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [country, setCountry] = useState('');
-  const [state, setState] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [country, setCountry] = useState('US');
+  const [state, setState] = useState('Florida');
   const [selectedZone, setSelectedZone] = useState<string | undefined>();
+  const [zones, setZones] = useState<Zone[]>([]);
+  const [loadingZones, setLoadingZones] = useState(false);
+
+  const loadZones = async () => {
+    setLoadingZones(true);
+    try {
+      const fetchedZones = await fetchZones('FL', 'fire');
+      console.log(zones);
+
+      setZones(fetchedZones);
+    } catch (error) {
+      console.error('Error fetching zones:', error);
+    } finally {
+      setLoadingZones(false);
+    }
+  };
+  useEffect(() => {
+    loadZones();
+  }, []);
 
   // Error state
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -43,7 +68,11 @@ export default function SignUpScreen({ navigation }: Props) {
     if (!email.trim()) newErrors.email = 'Email is required';
     else if (!/^\S+@\S+\.\S+$/.test(email)) newErrors.email = 'Invalid email';
     if (!password.trim()) newErrors.password = 'Password is required';
-    else if (password.length < 6) newErrors.password = 'Min 6 characters';
+    else if (password.length < 8) newErrors.password = 'Min 8 characters';
+    if (!confirmPassword.trim())
+      newErrors.confirmPassword = 'Confirm Password is required';
+    else if (confirmPassword !== password)
+      newErrors.confirmPassword = 'Passwords do not match';
     if (!country.trim()) newErrors.country = 'Country is required';
     if (!state.trim()) newErrors.state = 'State is required';
     setErrors(newErrors);
@@ -57,11 +86,44 @@ export default function SignUpScreen({ navigation }: Props) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleNextOrSubmit = () => {
+  const handleNextOrSubmit = async () => {
     if (step === 1) {
       if (validateStep1()) setStep(2);
+      console.log(errors);
     } else {
-      if (validateStep2()) setSuccessModalVisible(true);
+      if (validateStep2()) {
+        try {
+          const payload = {
+            firstName,
+            lastName,
+            email,
+            password,
+            confirmPassword,
+            country: 'US',
+            state: 'Florida',
+            zoneId: 'FLZ139'!,
+            // zoneId: selectedZone!,
+            deviceToken: await getDeviceToken(),
+          };
+
+          const res = await signup(payload);
+
+          if (res.success) {
+            // Save token for future requests
+            await AsyncStorage.setItem('authToken', res.data.token);
+
+            // Show success modal
+            setSuccessModalVisible(true);
+          } else {
+            setErrors({ api: res.message || 'Signup failed' });
+          }
+        } catch (error: any) {
+          console.error(error);
+          setErrors({
+            api: error.response?.data?.message || 'Something went wrong',
+          });
+        }
+      }
     }
   };
 
@@ -145,6 +207,14 @@ export default function SignUpScreen({ navigation }: Props) {
                   error={errors.password}
                 />
                 <CustomInput
+                  label="Confirm Password"
+                  placeholder="Re-enter your password"
+                  secureTextEntry
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  error={errors.confirmPassword}
+                />
+                <CustomInput
                   label="Country"
                   placeholder="US"
                   value={'US'}
@@ -171,8 +241,10 @@ export default function SignUpScreen({ navigation }: Props) {
                   Choose your Zone
                 </CustomText>
                 <CustomDropdown
-                  data={zoneData}
-                  placeholder="Select Zone"
+                  data={zones.map(z => ({ label: z.name, value: z.id }))}
+                  placeholder={
+                    loadingZones ? 'Loading Zones...' : 'Select Zone'
+                  }
                   selectedValue={selectedZone}
                   onSelect={item => setSelectedZone(item.value)}
                   maxHeight={500}
@@ -186,6 +258,15 @@ export default function SignUpScreen({ navigation }: Props) {
               <View style={styles.bottomButtonContainer}>
                 <CustomButton title={'Next'} onPress={handleNextOrSubmit} />
               </View>
+            )}
+
+            {errors.api && (
+              <CustomText
+                color="red"
+                style={{ textAlign: 'center', marginTop: 10 }}
+              >
+                {errors.api}
+              </CustomText>
             )}
           </View>
 
