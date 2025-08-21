@@ -18,6 +18,8 @@ import { bgColor } from '../../constants/colors';
 
 import { login } from '../../services/authService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch } from 'react-redux';
+import { setIsLoggedIn, setUser } from '../../redux/slices/authSlice';
 
 type Props = { navigation: RootStackNavigationProp<'SignIn'> };
 
@@ -28,6 +30,7 @@ export default function SignInScreen({ navigation }: Props) {
   const [passwordError, setPasswordError] = useState('');
   const [selected, setSelected] = useState(false);
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const validateEmail = (value: string) => {
     if (!value) return 'Email is required';
@@ -57,9 +60,9 @@ export default function SignInScreen({ navigation }: Props) {
         if (response.success) {
           const { token, firstName } = response.data;
 
-          // Save token to AsyncStorage for later API calls
           await AsyncStorage.setItem('authToken', token);
-
+          dispatch(setIsLoggedIn(true));
+          // dispatch(setUser(user));
           navigation.replace('HomeTabs');
         } else {
           Alert.alert(
