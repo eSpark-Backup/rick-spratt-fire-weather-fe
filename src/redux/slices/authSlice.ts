@@ -4,6 +4,9 @@ interface AuthState {
   isLoggedIn: boolean | false;
   token: string | null;
   user: any | null;
+  country?: string;
+  state?: string;
+  zoneId?: string;
 }
 
 const initialState: AuthState = {
@@ -17,21 +20,26 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action: PayloadAction<any>) => {
-      state.user = action.payload?.user || null;
-      if ('token' in action.payload) {
-        state.token = action.payload.token;
-      }
+      const { token, ...user } = action.payload;
+      state.user = user; // user details (id, name, email, zoneId, etc.)
+      state.token = token;
     },
-     setIsLoggedIn: (state, action: PayloadAction<boolean>) => {
+    setIsLoggedIn: (state, action: PayloadAction<boolean>) => {
       state.isLoggedIn = action.payload;
+    },
+    updateUserZone(state, action: PayloadAction<string>) {
+      if (state.user) {
+        state.user.zoneId = action.payload;
+      }
     },
     logout: state => {
       state.user = null;
       state.isLoggedIn = false;
       state.token = null;
-    }
+    },
   },
 });
 
-export const { setUser, logout,setIsLoggedIn } = authSlice.actions;
+export const { setUser, logout, setIsLoggedIn, updateUserZone } =
+  authSlice.actions;
 export default authSlice.reducer;
