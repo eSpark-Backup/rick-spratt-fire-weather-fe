@@ -14,6 +14,16 @@ export interface Threshold {
   updatedAt: string;
 }
 
+export type ThresholdPayload = {
+  temperature: number;
+  humidity: number;
+  windSpeed: number;
+  southDir: number;
+  northDir: number;
+  eastDir: number;
+  westDir: number;
+};
+
 export const getThermostats = async (): Promise<{
   data: Threshold;
   message: string;
@@ -23,7 +33,7 @@ export const getThermostats = async (): Promise<{
 };
 
 export const setThermostats = async (
-  payload: Threshold,
+  payload: ThresholdPayload,
 ): Promise<{ message: string }> => {
   const response = await api.post('/threshold', payload);
   return response.data;

@@ -7,7 +7,7 @@ import SettingsEditModal from '../../components/SettingsEditModal';
 import { CloudHot, Droplet, Flag, PlantKBDI, Wind } from '../../assets';
 import { bgColor, tempColor } from '../../constants/colors';
 import { Setting, KBDISetting, ValueSetting } from '../../types';
-import { getThermostats, setThermostats, Threshold } from '../../services/thermostatService'; // Adjust import path as needed
+import { getThermostats, setThermostats, Threshold, ThresholdPayload } from '../../services/thermostatService';
 
 const SETTINGS_CONFIG = [
   {
@@ -137,10 +137,11 @@ export default function SettingsScreen() {
                 rightValue: `${item.minValue}-${item.maxValue}`,
               } as KBDISetting;
             } else if (!config.isKBDI && 'value' in item) {
+              const numericValue = typeof apiValue === 'string' ? parseFloat(apiValue) : apiValue;
               return {
                 ...item,
-                value: apiValue,
-                rightValue: `${apiValue}${config.unit}`,
+                value: numericValue,
+                rightValue: `${numericValue}${config.unit}`,
               } as ValueSetting;
             }
           }
@@ -153,10 +154,11 @@ export default function SettingsScreen() {
       prev.map(item => {
         const apiValue = data[item.key as keyof Threshold];
         if (apiValue !== undefined && apiValue !== null) {
+          const numericValue = typeof apiValue === 'string' ? parseFloat(apiValue) : apiValue;
           return {
             ...item,
-            value: apiValue,
-            rightValue: `Above ${apiValue}`,
+            value: numericValue,
+            rightValue: `Above ${numericValue}`,
           };
         }
         return item;
@@ -223,7 +225,7 @@ export default function SettingsScreen() {
     }
   };
 
-  const collectCurrentThresholdData = (): Threshold => {
+  const collectCurrentThresholdData = (): ThresholdPayload => {
     const thresholdData: Partial<Threshold> = {};
 
     settings.forEach(setting => {
@@ -244,7 +246,7 @@ export default function SettingsScreen() {
       }
     });
 
-    const completeThresholdData: Threshold = {
+    const completeThresholdData: ThresholdPayload = {
       temperature: thresholdData.temperature ?? 80,
       humidity: thresholdData.humidity ?? 60,
       windSpeed: thresholdData.windSpeed ?? 15,
@@ -265,7 +267,7 @@ export default function SettingsScreen() {
       
       console.log('Sending threshold data:', thresholdData);
       
-      const response = await setThermostats(thresholdData);
+      const response = await setThermostats(thresholdData as any);
       
       Alert.alert(
         'Success', 
