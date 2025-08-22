@@ -10,6 +10,8 @@ import {
   WeatherObservation,
   fetchWeatherObservations,
 } from '../../services/weatherService';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
 
 type Props = { navigation: RootStackNavigationProp<'HomeTabs'> };
 
@@ -18,22 +20,32 @@ const COMMENT = 'Prescribed Conditions';
 export default function HomeScreen({ navigation }: Props) {
   const [observations, setObservations] = useState<WeatherObservation[]>([]);
   const [loading, setLoading] = useState(false);
+  const zoneId = useSelector((state: RootState) => state.auth.user?.zoneId);
 
   const loadWeather = async () => {
+    if (!zoneId) {
+      console.warn('[HomeScreen] No zoneId available in Redux');
+      return;
+    }
+
     setLoading(true);
     try {
-      const data = await fetchWeatherObservations('FLZ007');
+      console.log('[HomeScreen] Fetching weather for zoneId:', zoneId);
+      const data = await fetchWeatherObservations(zoneId);
+      console.log('[HomeScreen] Weather response:', data);
       setObservations(data);
     } catch (err) {
-      console.error(err);
+      console.error('[HomeScreen] Failed to fetch weather:', err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadWeather();
-  }, []);
+    if (zoneId) {
+      loadWeather();
+    }
+  }, [zoneId]);
 
   // Get the most recent observation
   const latest = observations.length > 0 ? observations[0] : null;
@@ -60,13 +72,13 @@ export default function HomeScreen({ navigation }: Props) {
           <CustomTile
             icon={<Droplet />}
             title="Humidity"
-            rightValue={`${latest.Humidity.toFixed(0)}%`}
+            rightValue={`${latest.Humidity?.toFixed(0)}%`}
             activeOpacity={1}
           />
           <CustomTile
             icon={<Wind />}
             title="Wind Speed"
-            rightValue={`${latest.windSpeed.toFixed(1)} mph`}
+            rightValue={`${latest.windSpeed?.toFixed(1)} mph`}
             activeOpacity={1}
           />
           <CustomTile

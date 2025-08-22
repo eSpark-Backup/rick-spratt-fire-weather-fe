@@ -72,17 +72,26 @@ export default function SignInScreen({ navigation }: Props) {
       try {
         setLoading(true);
         const response = await login({ email, password });
+        console.log('on sigin:', response);
 
         if (response.success) {
-          const userData = response.data; // full user + token
+          const userData = response.data;
           const { token } = userData;
-          const fcmToken = await getDeviceToken();
 
-          // Save token to storage
-          await updateDeviceToken(fcmToken);
+          // 1. Save token immediately
           await AsyncStorage.setItem('authToken', token);
+          dispatch(setUser(userData));
+          dispatch(setIsLoggedIn(true));
 
-          // Save credentials if Remember Me selected
+          // 2. Get FCM token and update backend
+          const fcmToken = await getDeviceToken();
+          try {
+            await updateDeviceToken(fcmToken); // now interceptor has the token ✅
+          } catch (err) {
+            console.warn('[Login] Failed to update device token:', err);
+          }
+
+          // 3. Save credentials if Remember Me selected
           if (selected) {
             await AsyncStorage.setItem(
               CREDENTIALS_KEY,
@@ -93,8 +102,6 @@ export default function SignInScreen({ navigation }: Props) {
           }
 
           await AsyncStorage.setItem('isUserLoggedIn', 'true');
-          dispatch(setIsLoggedIn(true));
-          dispatch(setUser(userData));
           navigation.replace('HomeTabs');
         } else {
           Alert.alert(
