@@ -45,7 +45,7 @@ function HomeTabs() {
 }
 
 function AppNavigator() {
-  console.log('this mounted');
+  // console.log('this mounted');
   const [initialRoute, setInitialRoute] = useState<
     keyof RootStackParamList | null
   >(null);

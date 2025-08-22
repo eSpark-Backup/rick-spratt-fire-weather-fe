@@ -4,7 +4,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import RootNavigation from './src/navigation/index';
 import getDeviceToken from './src/utils/getDeviceToken';
 import { Provider } from 'react-redux';
-import { store } from './src/redux/store';
+import { persistor, store } from './src/redux/store';
+import { PersistGate } from 'redux-persist/integration/react';
 
 export default function App() {
   useEffect(() => {
@@ -13,9 +14,11 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-        <Provider store={store}>
-      <StatusBar barStyle="dark-content" />
-      <RootNavigation />
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <StatusBar barStyle="dark-content" />
+          <RootNavigation />
+        </PersistGate>
       </Provider>
     </SafeAreaProvider>
   );
