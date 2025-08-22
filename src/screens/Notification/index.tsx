@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import NotificationTile from '../../components/NotificationTile';
 import { bgColor, primaryColor } from '../../constants/colors';
 import { AppDispatch, RootState } from '../../redux/store';
-import { fetchAllNotifications } from '../../services/notificationService'; // 👈 where your thunk lives
+import { fetchAllNotifications } from '../../services/notificationService';
 import CustomText from '../../components/CustomText';
 import { CloudCool } from '../../assets';
 
@@ -21,6 +21,7 @@ export default function NotificationsScreen() {
   const { notifications, loading, error } = useSelector(
     (state: RootState) => state.notification,
   );
+  const hasNotifications = Array.isArray(notifications) && notifications.length > 0;
 
   useEffect(() => {
     dispatch(fetchAllNotifications());
@@ -36,6 +37,12 @@ export default function NotificationsScreen() {
         <View style={styles.center}>
           <CustomText size={14} color="red">
             {error}
+          </CustomText>
+        </View>
+      ): !hasNotifications ? (
+        <View style={styles.center}>
+          <CustomText size={14} color="gray">
+            No notifications found
           </CustomText>
         </View>
       ) : (

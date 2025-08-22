@@ -19,7 +19,7 @@ export const fetchAllNotifications = () => async (dispatch: AppDispatch) => {
       const response = await api.get(`/notifications?page=${page}&limit=10`);
 
       const notifications = response.data.data.notifications;
-      const pagination = response.data.data.pagination;
+      const pagination = response.data.data.meta;
 
       console.log('Fetched page notifications:', notifications);
 
