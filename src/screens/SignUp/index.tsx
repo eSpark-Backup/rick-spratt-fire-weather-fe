@@ -21,7 +21,7 @@ import { signup } from '../../services/authService';
 import getDeviceToken from '../../utils/getDeviceToken';
 import { fetchZones, Zone } from '../../services/zoneService';
 import { useDispatch } from 'react-redux';
-import { setUser } from '../../redux/slices/authSlice';
+import { setUser, setIsLoggedIn } from '../../redux/slices/authSlice';
 
 type Props = { navigation: RootStackNavigationProp<'SignUp'> };
 
@@ -111,9 +111,15 @@ export default function SignUpScreen({ navigation }: Props) {
           const res = await signup(payload);
 
           if (res.success) {
-            // Save token for future requests
-            await AsyncStorage.setItem('authToken', res.data.token);
-          // dispatch(setUser(user));
+            const userData = res.data; // full user + token
+            const { token } = userData;
+
+            // Save token to storage
+            await AsyncStorage.setItem('authToken', token);
+
+            // Update Redux
+            dispatch(setIsLoggedIn(true));
+            dispatch(setUser(userData));
             setSuccessModalVisible(true);
           } else {
             setErrors({ api: res.message || 'Signup failed' });

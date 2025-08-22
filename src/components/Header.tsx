@@ -21,7 +21,12 @@ import { BottomTabNavigationProp } from '../navigation/navigation';
 import { selectedCountry, selectedState } from '../constants';
 import { labelColor } from '../constants/colors';
 import { DropdownItem, HeaderProps } from '../types';
+
 import { Zone, fetchZones, updateZone } from '../services/zoneService';
+import { useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
+import { useDispatch } from 'react-redux';
+import { updateUserZone } from '../redux/slices/authSlice';
 
 const Header: React.FC<HeaderProps> = ({
   username,
@@ -32,11 +37,13 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const navigation = useNavigation<BottomTabNavigationProp>();
   const route = useRoute();
+  const user = useSelector((state: RootState) => state.auth.user);
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<DropdownItem>(
-    locations[0],
-  );
+  const [selectedLocation, setSelectedLocation] = useState<DropdownItem>({
+    label: user?.zoneName || user?.zoneId,
+    value: user?.zoneId,
+  });
   const [dropdownPosition, setDropdownPosition] = useState<{
     top: number;
     left: number;
@@ -44,6 +51,7 @@ const Header: React.FC<HeaderProps> = ({
   } | null>(null);
   const [zones, setZones] = useState<Zone[]>([]);
   const [loadingZones, setLoadingZones] = useState(false);
+  const dispatch = useDispatch();
 
   const loadZones = async () => {
     setLoadingZones(true);
@@ -92,8 +100,11 @@ const Header: React.FC<HeaderProps> = ({
     setModalVisible(false);
 
     try {
-      const res = await updateZone(item.value); // call API with selected zoneId
+      const res = await updateZone(item.value); // API call
       console.log('Zone updated:', res);
+
+      // ✅ update Redux store
+      dispatch(updateUserZone(item.value));
     } catch (err) {
       console.error('Error updating zone:', err);
     }
@@ -142,7 +153,7 @@ const Header: React.FC<HeaderProps> = ({
           color={labelColor}
           fontFamily="Gilroy-Regular"
         >
-          Hi, {username}
+          Hi, {user?.firstName}
         </CustomText>
 
         <TouchableOpacity
@@ -153,7 +164,7 @@ const Header: React.FC<HeaderProps> = ({
         >
           <LocationIcon />
           <CustomText style={styles.locationCustomText}>
-            {selectedCountry}, {selectedState}, {selectedLocation.label}
+            {user?.country}, {user?.state}, {selectedLocation.label}
           </CustomText>
           {modalVisible ? <ArrowUp /> : <ArrowDown />}
         </TouchableOpacity>
