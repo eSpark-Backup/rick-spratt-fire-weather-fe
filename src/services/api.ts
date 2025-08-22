@@ -1,14 +1,12 @@
-// services/api.ts
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { navigate } from '../navigation/RootNavigation';
 
 const api = axios.create({
-  baseURL: 'https://3a3017439dbc.ngrok-free.app/api',
+  baseURL: 'https://4ed65161addf.ngrok-free.app/api',
   timeout: 10000,
 });
 
-// Request interceptor: attach token
 api.interceptors.request.use(
   async config => {
     const token = await AsyncStorage.getItem('authToken');

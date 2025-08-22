@@ -1,11 +1,14 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import CustomText from './CustomText';
 import { ActiveSettingsIcon, Logout, SettingsIcon } from '../assets';
 import { primaryColor } from '../constants/colors';
 import { getActiveRouteName } from '../navigation/RootNavigation';
 import { CustomTabBarProps } from '../types';
+import { useDispatch } from 'react-redux';
+import { logout } from '../redux/slices/authSlice';
 
 const TABS = [
   {
@@ -13,6 +16,7 @@ const TABS = [
     label: 'Close App',
     icon: <Logout height={24} width={24} />,
     navigateTo: 'SignIn',
+    isLogout: true, // 🔑 add flag
   },
   {
     key: 'Settings',
@@ -29,10 +33,23 @@ const TABS = [
 
 const CustomTabBar: React.FC<CustomTabBarProps> = ({ navigation, state }) => {
   const currentScreen = getActiveRouteName();
+  const dispatch = useDispatch();
+  const handleLogout = async (navigateTo: string) => {
+    try {
+      await AsyncStorage.removeItem('authToken'); 
+      dispatch(logout());
+    } catch (err) {
+      console.error('Error clearing token:', err);
+    }
+    navigation.reset({
+      index: 0,
+      routes: [{ name: navigateTo }],
+    });
+  };
 
   return (
     <View style={styles.container}>
-      {TABS.map(({ key, label, icon, navigateTo }, index) => {
+      {TABS.map(({ key, label, icon, navigateTo, isLogout }, index) => {
         const isFocused = state.index === index;
         const isSettings = label === 'Settings';
         const tabIcon =
@@ -41,7 +58,9 @@ const CustomTabBar: React.FC<CustomTabBarProps> = ({ navigation, state }) => {
             : icon;
 
         const onPress = () => {
-          if (currentScreen !== navigateTo) {
+          if (isLogout) {
+            handleLogout(navigateTo);
+          } else if (currentScreen !== navigateTo) {
             navigation.navigate(navigateTo);
           }
         };

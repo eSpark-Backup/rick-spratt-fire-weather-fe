@@ -16,6 +16,19 @@ export type BaseSetting = {
   color?: string;
 };
 
+export interface Notification {
+  id: string;
+  userId: string;
+  title: string;
+  body: string;
+  type: string;
+  severity: string;
+  isRead: boolean;
+  createdAt: string;
+  updatedAt: string;
+  icon?: React.ReactNode;
+}
+
 export type ValueSetting = BaseSetting & {
   value: number;
   minValue?: undefined;

@@ -25,7 +25,6 @@ const NotificationTile: React.FC<NotificationTileProps> = ({
           </CustomText>
         </View>
       </View>
-      {/* <ChevronRight width={16} height={16} /> */}
     </ColoredTile>
   );
 };

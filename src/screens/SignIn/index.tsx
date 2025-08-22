@@ -92,7 +92,7 @@ export default function SignInScreen({ navigation }: Props) {
             await AsyncStorage.removeItem(CREDENTIALS_KEY);
           }
 
-          // Update Redux
+          await AsyncStorage.setItem('isUserLoggedIn', 'true');
           dispatch(setIsLoggedIn(true));
           dispatch(setUser(userData));
           navigation.replace('HomeTabs');
