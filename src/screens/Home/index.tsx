@@ -81,12 +81,12 @@ export default function HomeScreen({ navigation }: Props) {
             rightValue={`${latest.windSpeed?.toFixed(1)} mph`}
             activeOpacity={1}
           />
-          <CustomTile
+          {/* <CustomTile
             icon={<PlantKBDI />}
             title="KBDI"
             rightValue="150-500" // <-- If backend gives this later, replace static
             activeOpacity={1}
-          />
+          /> */}
           <CustomTile
             icon={<Flag />}
             title="Wind Direction"
