@@ -103,8 +103,8 @@ export default function SignUpScreen({ navigation }: Props) {
             confirmPassword,
             country: 'US',
             state: 'Florida',
-            zoneId: 'FLZ139'!,
-            // zoneId: selectedZone!,
+            // zoneId: 'FLZ139'!,
+            zoneId: selectedZone!,
             deviceToken: await getDeviceToken(),
           };
 

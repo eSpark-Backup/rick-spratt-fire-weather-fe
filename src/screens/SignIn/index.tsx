@@ -14,13 +14,14 @@ import CustomText from '../../components/CustomText';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
 import RadioButton from '../../components/RadioButton';
-import { bgColor } from '../../constants/colors';
+import { bgColor, tempColor } from '../../constants/colors';
 
 import { login, updateDeviceToken } from '../../services/authService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch } from 'react-redux';
 import { setIsLoggedIn, setUser } from '../../redux/slices/authSlice';
 import getDeviceToken from '../../utils/getDeviceToken';
+import { ActivityIndicator } from 'react-native';
 
 type Props = { navigation: RootStackNavigationProp<'SignIn'> };
 
@@ -171,13 +172,20 @@ export default function SignInScreen({ navigation }: Props) {
         </View>
 
         <View style={styles.buttonContainer}>
-          <CustomButton
-            title="Login"
-            onPress={handleLogin}
-            textStyle={styles.loginButtonText}
-            disabled={!isFormValid}
-          />
-
+          {loading ? (
+            <ActivityIndicator
+              size="large"
+              color={tempColor}
+              style={{ marginBottom: '6.5%' }}
+            />
+          ) : (
+            <CustomButton
+              title="Login"
+              onPress={handleLogin}
+              textStyle={styles.loginButtonText}
+              disabled={!isFormValid}
+            />
+          )}
           <View style={styles.linkContainer}>
             <CustomText>Don’t have an account?</CustomText>
             <TouchableOpacity onPress={handleSignUp}>

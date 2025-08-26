@@ -16,7 +16,7 @@ export default function App() {
     <SafeAreaProvider>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <StatusBar barStyle="dark-content" />
+          <StatusBar barStyle={'light-content'} />
           <RootNavigation />
         </PersistGate>
       </Provider>
