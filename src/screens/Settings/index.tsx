@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Alert } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, Alert, ActivityIndicator, View } from 'react-native';
 import CustomTile from '../../components/CustomTile';
 import CustomText from '../../components/CustomText';
 import CustomButton from '../../components/CustomButton';
@@ -347,6 +347,13 @@ export default function SettingsScreen() {
         onClose={() => setModalVisible(false)}
         onValueChange={handleValueChange}
       />
+
+      {loading && (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color="#007AFF" />
+          <CustomText size={14} style={{ marginTop: 10 }}>Loading... Please wait</CustomText>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -367,5 +374,12 @@ const styles = StyleSheet.create({
   },
   windDirectionLabel: {
     paddingBottom: 10,
+  },
+  loaderContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999,
   },
 });

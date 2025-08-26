@@ -1,13 +1,19 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+  Alert,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch } from 'react-redux';
 
 import CustomText from './CustomText';
 import { ActiveSettingsIcon, Logout, SettingsIcon } from '../assets';
 import { primaryColor } from '../constants/colors';
 import { getActiveRouteName } from '../navigation/RootNavigation';
 import { CustomTabBarProps } from '../types';
-import { useDispatch } from 'react-redux';
 import { logout } from '../redux/slices/authSlice';
 
 const TABS = [
@@ -34,9 +40,10 @@ const TABS = [
 const CustomTabBar: React.FC<CustomTabBarProps> = ({ navigation, state }) => {
   const currentScreen = getActiveRouteName();
   const dispatch = useDispatch();
+
   const handleLogout = async (navigateTo: string) => {
     try {
-      await AsyncStorage.removeItem('authToken'); 
+      await AsyncStorage.removeItem('authToken');
       dispatch(logout());
     } catch (err) {
       console.error('Error clearing token:', err);
@@ -59,7 +66,18 @@ const CustomTabBar: React.FC<CustomTabBarProps> = ({ navigation, state }) => {
 
         const onPress = () => {
           if (isLogout) {
-            handleLogout(navigateTo);
+            Alert.alert(
+              'Logout',
+              'Are you sure you want to logout?',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'OK',
+                  onPress: () => handleLogout(navigateTo),
+                },
+              ],
+              { cancelable: true }
+            );
           } else if (currentScreen !== navigateTo) {
             navigation.navigate(navigateTo);
           }
