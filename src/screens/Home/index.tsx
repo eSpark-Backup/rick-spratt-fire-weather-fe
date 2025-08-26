@@ -1,5 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  SafeAreaView,
+  StyleSheet,
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+} from 'react-native';
 import { RootStackNavigationProp } from '../../navigation/navigation';
 import CustomTile from '../../components/CustomTile';
 import ColoredTile from '../../components/ColoredTIle';
@@ -20,15 +26,16 @@ const COMMENT = 'Prescribed Conditions';
 export default function HomeScreen({ navigation }: Props) {
   const [observations, setObservations] = useState<WeatherObservation[]>([]);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const zoneId = useSelector((state: RootState) => state.auth.user?.zoneId);
 
-  const loadWeather = async () => {
+  const loadWeather = async (isRefresh = false) => {
     if (!zoneId) {
       console.warn('[HomeScreen] No zoneId available in Redux');
       return;
     }
 
-    setLoading(true);
+    if (!isRefresh) setLoading(true);
     try {
       console.log('[HomeScreen] Fetching weather for zoneId:', zoneId);
       const data = await fetchWeatherObservations(zoneId);
@@ -37,7 +44,7 @@ export default function HomeScreen({ navigation }: Props) {
     } catch (err) {
       console.error('[HomeScreen] Failed to fetch weather:', err);
     } finally {
-      setLoading(false);
+      if (!isRefresh) setLoading(false);
     }
   };
 
@@ -47,62 +54,83 @@ export default function HomeScreen({ navigation }: Props) {
     }
   }, [zoneId]);
 
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadWeather(true); // ✅ pass true so it won't trigger `loading`
+    setRefreshing(false);
+  }, [zoneId]);
+
   // Get the most recent observation
   const latest = observations.length > 0 ? observations[0] : null;
 
   return (
     <SafeAreaView style={styles.container}>
-      {loading && (
-        <ActivityIndicator
-          size="large"
-          color={tempColor}
-          style={{ marginBottom: '7%' }}
-        />
-      )}
-
-      {latest && (
-        <>
-          <CustomTile
-            icon={<CloudHot />}
-            title="Temperature"
-            rightValue={`${latest.temperature}°C`}
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={tempColor}
+          />
+        }
+      >
+        {loading && (
+          <ActivityIndicator
+            size="large"
             color={tempColor}
-            activeOpacity={1}
+            style={{ marginBottom: '7%' }}
           />
-          <CustomTile
-            icon={<Droplet />}
-            title="Humidity"
-            rightValue={`${latest.Humidity?.toFixed(0)}%`}
-            activeOpacity={1}
-          />
-          <CustomTile
-            icon={<Wind />}
-            title="Wind Speed"
-            rightValue={`${latest.windSpeed?.toFixed(1)} mph`}
-            activeOpacity={1}
-          />
-          {/* <CustomTile
+        )}
+
+        {latest && (
+          <>
+            <CustomTile
+              icon={<CloudHot />}
+              title="Temperature"
+              rightValue={`${latest.temperature}°C`}
+              color={tempColor}
+              activeOpacity={1}
+            />
+            <CustomTile
+              icon={<Droplet />}
+              title="Humidity"
+              rightValue={`${latest.Humidity?.toFixed(0)}%`}
+              activeOpacity={1}
+            />
+            <CustomTile
+              icon={<Wind />}
+              title="Wind Speed"
+              rightValue={`${latest.windSpeed?.toFixed(1)} mph`}
+              activeOpacity={1}
+            />
+            {/* <CustomTile
             icon={<PlantKBDI />}
             title="KBDI"
             rightValue="150-500" // <-- If backend gives this later, replace static
             activeOpacity={1}
           /> */}
-          <CustomTile
-            icon={<Flag />}
-            title="Wind Direction"
-            rightValue={`${latest.windDirection}°`}
-            activeOpacity={1}
-          />
-        </>
-      )}
+            <CustomTile
+              icon={<Flag />}
+              title="Wind Direction"
+              rightValue={`${latest.windDirection}°`}
+              activeOpacity={1}
+            />
+          </>
+        )}
 
-      {!loading && !latest && (
-        <CustomText>No weather data available.</CustomText>
-      )}
+        {!loading && !latest && (
+          <CustomText>No weather data available.</CustomText>
+        )}
 
-      <ColoredTile color="#FAFAFA" style={styles.commentTile} activeOpacity={1}>
-        <CustomText style={styles.commentText}>{COMMENT}</CustomText>
-      </ColoredTile>
+        <ColoredTile
+          color="#FAFAFA"
+          style={styles.commentTile}
+          activeOpacity={1}
+        >
+          <CustomText style={styles.commentText}>{COMMENT}</CustomText>
+        </ColoredTile>
+      </ScrollView>
     </SafeAreaView>
   );
 }
