@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 
 import { RootStackNavigationProp } from '../../navigation/navigation';
@@ -21,7 +22,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch } from 'react-redux';
 import { setIsLoggedIn, setUser } from '../../redux/slices/authSlice';
 import getDeviceToken from '../../utils/getDeviceToken';
-import { ActivityIndicator } from 'react-native';
 
 type Props = { navigation: RootStackNavigationProp<'SignIn'> };
 
@@ -111,10 +111,14 @@ export default function SignInScreen({ navigation }: Props) {
           );
         }
       } catch (error: any) {
-        Alert.alert(
-          'Login Failed',
-          error?.message || 'Invalid credentials. Please try again.',
-        );
+        if (error?.response?.status === 401) {
+          Alert.alert('Login Failed', 'Incorrect credentials');
+        } else {
+          Alert.alert(
+            'Login Failed',
+            error?.message || 'Invalid credentials. Please try again.',
+          );
+        }
       } finally {
         setLoading(false);
       }
