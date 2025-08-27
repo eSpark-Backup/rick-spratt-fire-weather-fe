@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { navigate } from '../navigation/RootNavigation';
 
 const api = axios.create({
-  baseURL: 'https://d844f085ea8f.ngrok-free.app/api',
+  baseURL: 'https://d03a284fed13.ngrok-free.app/api',
   timeout: 10000,
 });
 

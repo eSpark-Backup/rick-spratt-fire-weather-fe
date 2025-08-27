@@ -87,7 +87,7 @@ export default function SignInScreen({ navigation }: Props) {
           // 2. Get FCM token and update backend
           const fcmToken = await getDeviceToken();
           try {
-            await updateDeviceToken(fcmToken); // now interceptor has the token ✅
+            await updateDeviceToken(fcmToken!); // now interceptor has the token ✅
           } catch (err) {
             console.warn('[Login] Failed to update device token:', err);
           }
