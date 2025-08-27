@@ -71,6 +71,11 @@ export default function DropdownModal({
                   </TouchableOpacity>
                 );
               }}
+              ListEmptyComponent={
+                <View style={styles.emptyContainer}>
+                  <CustomText text="No data available" />
+                </View>
+              }
               showsVerticalScrollIndicator={false}
             />
           </View>
@@ -93,5 +98,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
