@@ -72,7 +72,7 @@ export default function SignInScreen({ navigation }: Props) {
     if (!emailErr && !passErr) {
       try {
         setLoading(true);
-        const response = await login({ email: email, password });
+        const response = await login({ email: email.toLowerCase(), password });
         console.log('on sigin:', response);
 
         if (response.success) {
