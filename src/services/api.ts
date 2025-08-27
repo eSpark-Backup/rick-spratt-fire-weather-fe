@@ -1,9 +1,10 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { navigate } from '../navigation/RootNavigation';
+import Config from 'react-native-config';
 
 const api = axios.create({
-  baseURL: 'https://d03a284fed13.ngrok-free.app/api',
+  baseURL: Config.API_BASE_URL,
   timeout: 10000,
 });
 
