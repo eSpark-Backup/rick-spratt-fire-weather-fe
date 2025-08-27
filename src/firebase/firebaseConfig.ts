@@ -1,13 +1,14 @@
 // src/firebaseConfig.ts
 import firebase from '@react-native-firebase/app';
+import Config from 'react-native-config';
 
 const firebaseConfig = {
-  projectId: 'fire-weather-alert',
-  appId: '1:901823920988:android:dd8f9dd611e3a7aa52df99',
-  apiKey: 'AIzaSyBZstSpeIhbWTZ9L2d2dXmaeI_1dsIV-5k',
-  storageBucket: 'fire-weather-alert.firebasestorage.app',
-  messagingSenderId: '901823920988',
-  authDomain: 'fire-weather-alert.firebaseapp.com',
+  apiKey: Config.FIREBASE_API_KEY!,
+  authDomain: Config.FIREBASE_AUTH_DOMAIN!,
+  projectId: Config.FIREBASE_PROJECT_ID!,
+  storageBucket: Config.FIREBASE_STORAGE_BUCKET!,
+  messagingSenderId: Config.FIREBASE_MESSAGING_SENDER_ID!,
+  appId: Config.FIREBASE_APP_ID!,
 };
 
 if (!firebase.apps.length) {
