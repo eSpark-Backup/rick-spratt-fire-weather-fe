@@ -2,7 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
-import { ActivityIndicator, SafeAreaView, StyleSheet } from 'react-native';
+import {
+  ActivityIndicator,
+  SafeAreaView,
+  StyleSheet,
+  View,
+} from 'react-native';
 
 import { RootStackParamList } from './navigation';
 import HomeScreen from '../screens/Home';
@@ -17,6 +22,7 @@ import CustomTabBar from '../components/CustomTabBar';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator();
@@ -97,7 +103,15 @@ function AppNavigator() {
 export default function RootNavigation() {
   console.log('✅ RootNavigation mounted');
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView
+      style={[
+        styles.safeArea,
+        {
+          paddingTop: useSafeAreaInsets().top,
+          paddingBottom: useSafeAreaInsets().bottom,
+        },
+      ]}
+    >
       <NavigationContainer
         ref={navigationRef}
         onStateChange={() => {

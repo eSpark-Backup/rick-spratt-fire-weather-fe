@@ -71,6 +71,9 @@ export default function SignUpScreen({ navigation }: Props) {
     else if (!/^\S+@\S+\.\S+$/.test(email)) newErrors.email = 'Invalid email';
     if (!password.trim()) newErrors.password = 'Password is required';
     else if (password.length < 8) newErrors.password = 'Min 8 characters';
+    else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password))
+      newErrors.password =
+        'Must contain at least an uppercase letter, a lowercase letter and a number';
     if (!confirmPassword.trim())
       newErrors.confirmPassword = 'Confirm Password is required';
     else if (confirmPassword !== password)
@@ -99,7 +102,7 @@ export default function SignUpScreen({ navigation }: Props) {
           const payload = {
             firstName,
             lastName,
-            email,
+            email: email.toLowerCase(),
             password,
             confirmPassword,
             country: 'US',
