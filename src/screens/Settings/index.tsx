@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Alert, ActivityIndicator, View } from 'react-native';
+import {
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+  View,
+  Dimensions,
+} from 'react-native';
 import CustomTile from '../../components/CustomTile';
 import CustomText from '../../components/CustomText';
 import CustomButton from '../../components/CustomButton';
@@ -7,7 +15,12 @@ import SettingsEditModal from '../../components/SettingsEditModal';
 import { CloudHot, Droplet, Flag, PlantKBDI, Wind } from '../../assets';
 import { bgColor, tempColor } from '../../constants/colors';
 import { Setting, KBDISetting, ValueSetting } from '../../types';
-import { getThermostats, setThermostats, Threshold, ThresholdPayload } from '../../services/thermostatService';
+import {
+  getThermostats,
+  setThermostats,
+  Threshold,
+  ThresholdPayload,
+} from '../../services/thermostatService';
 
 const SETTINGS_CONFIG = [
   {
@@ -46,7 +59,7 @@ const SETTINGS_CONFIG = [
     defaultMinValue: 150,
     defaultMaxValue: 500,
     isKBDI: true,
-    enabled: false, 
+    enabled: false,
   },
 ];
 
@@ -56,6 +69,8 @@ const WIND_DIRECTIONS_CONFIG = [
   { key: 'westDir', direction: 'West', defaultValue: 75 },
   { key: 'eastDir', direction: 'East', defaultValue: 75 },
 ];
+
+const { width, height } = Dimensions.get('screen');
 
 export default function SettingsScreen() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -99,7 +114,9 @@ export default function SettingsScreen() {
   };
 
   const [settings, setSettings] = useState<Setting[]>(initializeSettings());
-  const [windDirections, setWindDirections] = useState(initializeWindDirections());
+  const [windDirections, setWindDirections] = useState(
+    initializeWindDirections(),
+  );
 
   useEffect(() => {
     loadThresholdData();
@@ -110,14 +127,17 @@ export default function SettingsScreen() {
       setLoading(true);
       const response = await getThermostats();
       const data = response.data;
-      
+
       if (data && typeof data === 'object') {
         updateSettingsFromAPI(data);
         setInitialDataLoaded(true);
       }
     } catch (error) {
       console.error('Error loading threshold data:', error);
-      Alert.alert('Error', 'Failed to load threshold data. Using default values.');
+      Alert.alert(
+        'Error',
+        'Failed to load threshold data. Using default values.',
+      );
       setInitialDataLoaded(true);
     } finally {
       setLoading(false);
@@ -137,7 +157,8 @@ export default function SettingsScreen() {
                 rightValue: `${item.minValue}-${item.maxValue}`,
               } as KBDISetting;
             } else if (!config.isKBDI && 'value' in item) {
-              const numericValue = typeof apiValue === 'string' ? parseFloat(apiValue) : apiValue;
+              const numericValue =
+                typeof apiValue === 'string' ? parseFloat(apiValue) : apiValue;
               return {
                 ...item,
                 value: numericValue,
@@ -154,7 +175,8 @@ export default function SettingsScreen() {
       prev.map(item => {
         const apiValue = data[item.key as keyof Threshold];
         if (apiValue !== undefined && apiValue !== null) {
-          const numericValue = typeof apiValue === 'string' ? parseFloat(apiValue) : apiValue;
+          const numericValue =
+            typeof apiValue === 'string' ? parseFloat(apiValue) : apiValue;
           return {
             ...item,
             value: numericValue,
@@ -181,7 +203,7 @@ export default function SettingsScreen() {
     value: number | { min: number; max: number },
   ) => {
     const config = SETTINGS_CONFIG.find(c => c.key === key);
-    
+
     if (config && config.enabled) {
       setSettings(prev =>
         prev.map(item => {
@@ -231,8 +253,12 @@ export default function SettingsScreen() {
     settings.forEach(setting => {
       if ('value' in setting && setting.value !== undefined) {
         (thresholdData as any)[setting.key] = setting.value;
-      } else if ('minValue' in setting && 'maxValue' in setting && 
-                 setting.minValue !== undefined && setting.maxValue !== undefined) {
+      } else if (
+        'minValue' in setting &&
+        'maxValue' in setting &&
+        setting.minValue !== undefined &&
+        setting.maxValue !== undefined
+      ) {
         (thresholdData as any)[setting.key] = {
           min: setting.minValue,
           max: setting.maxValue,
@@ -262,30 +288,30 @@ export default function SettingsScreen() {
   const handleSetThreshold = async () => {
     try {
       setLoading(true);
-      
+
       const thresholdData = collectCurrentThresholdData();
-      
+
       console.log('Sending threshold data:', thresholdData);
-      
+
       const response = await setThermostats(thresholdData as any);
-      
+
       Alert.alert(
-        'Success', 
+        'Success',
         response.message || 'Threshold values updated successfully',
         [
           {
             text: 'OK',
             onPress: () => {
               loadThresholdData();
-            }
-          }
-        ]
+            },
+          },
+        ],
       );
     } catch (error) {
       console.error('Error setting threshold:', error);
       Alert.alert(
-        'Error', 
-        'Failed to update threshold values. Please try again.'
+        'Error',
+        'Failed to update threshold values. Please try again.',
       );
     } finally {
       setLoading(false);
@@ -334,8 +360,8 @@ export default function SettingsScreen() {
           </>
         )}
 
-        <CustomButton 
-          title={loading ? "Setting..." : "Set Prescribed"} 
+        <CustomButton
+          title={loading ? 'Setting...' : 'Set Prescribed'}
           onPress={handleSetThreshold}
           disabled={loading}
         />
@@ -351,7 +377,9 @@ export default function SettingsScreen() {
       {loading && (
         <View style={styles.loaderContainer}>
           <ActivityIndicator size="large" color="#007AFF" />
-          <CustomText size={14} style={{ marginTop: 10 }}>Loading... Please wait</CustomText>
+          <CustomText size={14} style={{ marginTop: 10 }}>
+            Loading... Please wait
+          </CustomText>
         </View>
       )}
     </SafeAreaView>
