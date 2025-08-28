@@ -10,7 +10,17 @@ import { RootStackNavigationProp } from '../../navigation/navigation';
 import CustomTile from '../../components/CustomTile';
 import ColoredTile from '../../components/ColoredTIle';
 import CustomText from '../../components/CustomText';
-import { CloudHot, Droplet, Wind, PlantKBDI, Flag } from '../../assets';
+import {
+  CloudHot,
+  Droplet,
+  Wind,
+  PlantKBDI,
+  Flag,
+  CloudCool,
+  WindHot,
+  DropletHot,
+  FlagRed,
+} from '../../assets';
 import { bgColor, tempColor } from '../../constants/colors';
 import {
   WeatherObservation,
@@ -104,7 +114,13 @@ export default function HomeScreen({ navigation }: Props) {
         {latest && threshold && (
           <>
             <CustomTile
-              icon={<CloudHot />}
+              icon={
+                isExceeding(latest.temperature, threshold.temperature) ? (
+                  <CloudHot />
+                ) : (
+                  <CloudCool />
+                )
+              }
               title="Temperature"
               rightValue={`${latest.temperature}°C`}
               color={
@@ -116,7 +132,13 @@ export default function HomeScreen({ navigation }: Props) {
             />
 
             <CustomTile
-              icon={<Droplet />}
+              icon={
+                isExceeding(latest.Humidity, threshold.humidity) ? (
+                  <DropletHot />
+                ) : (
+                  <Droplet />
+                )
+              }
               title="Humidity"
               rightValue={`${latest.Humidity?.toFixed(0)}%`}
               color={
@@ -128,7 +150,13 @@ export default function HomeScreen({ navigation }: Props) {
             />
 
             <CustomTile
-              icon={<Wind />}
+              icon={
+                isExceeding(latest.windSpeed, threshold.windSpeed) ? (
+                  <WindHot />
+                ) : (
+                  <Wind />
+                )
+              }
               title="Wind Speed"
               rightValue={`${latest.windSpeed?.toFixed(1)} mph`}
               color={
@@ -140,7 +168,16 @@ export default function HomeScreen({ navigation }: Props) {
             />
 
             <CustomTile
-              icon={<Flag />}
+              icon={
+                isExceeding(latest.windDirection, threshold.northDir) ||
+                isExceeding(latest.windDirection, threshold.southDir) ||
+                isExceeding(latest.windDirection, threshold.eastDir) ||
+                isExceeding(latest.windDirection, threshold.westDir) ? (
+                  <FlagRed />
+                ) : (
+                  <Flag />
+                )
+              }
               title="Wind Direction"
               rightValue={`${latest.windDirection}°`}
               color={
