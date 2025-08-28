@@ -18,6 +18,8 @@ import {
 } from '../../services/weatherService';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
+import { Threshold, getThermostats } from '../../services/thermostatService';
+import { isExceeding } from '../../utils/isexceeding';
 
 type Props = { navigation: RootStackNavigationProp<'HomeTabs'> };
 
@@ -27,6 +29,8 @@ export default function HomeScreen({ navigation }: Props) {
   const [observations, setObservations] = useState<WeatherObservation[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [threshold, setThreshold] = useState<Threshold | null>(null);
+
   const zoneId = useSelector((state: RootState) => state.auth.user?.zoneId);
 
   const loadWeather = async (isRefresh = false) => {
@@ -54,8 +58,22 @@ export default function HomeScreen({ navigation }: Props) {
     }
   }, [zoneId]);
 
+  const loadThresholds = async () => {
+    try {
+      const res = await getThermostats();
+      setThreshold(res.data);
+    } catch (err) {
+      console.error('[HomeScreen] Failed to fetch thresholds:', err);
+    }
+  };
+
+  useEffect(() => {
+    loadThresholds();
+  }, []);
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
+    loadThresholds();
     await loadWeather(true); // ✅ pass true so it won't trigger `loading`
     setRefreshing(false);
   }, [zoneId]);
@@ -83,37 +101,56 @@ export default function HomeScreen({ navigation }: Props) {
           />
         )}
 
-        {latest && (
+        {latest && threshold && (
           <>
             <CustomTile
               icon={<CloudHot />}
               title="Temperature"
               rightValue={`${latest.temperature}°C`}
-              color={tempColor}
+              color={
+                isExceeding(latest.temperature, threshold.temperature)
+                  ? tempColor
+                  : undefined
+              }
               activeOpacity={1}
             />
+
             <CustomTile
               icon={<Droplet />}
               title="Humidity"
               rightValue={`${latest.Humidity?.toFixed(0)}%`}
+              color={
+                isExceeding(latest.Humidity, threshold.humidity)
+                  ? tempColor
+                  : undefined
+              }
               activeOpacity={1}
             />
+
             <CustomTile
               icon={<Wind />}
               title="Wind Speed"
               rightValue={`${latest.windSpeed?.toFixed(1)} mph`}
+              color={
+                isExceeding(latest.windSpeed, threshold.windSpeed)
+                  ? tempColor
+                  : undefined
+              }
               activeOpacity={1}
             />
-            {/* <CustomTile
-            icon={<PlantKBDI />}
-            title="KBDI"
-            rightValue="150-500" // <-- If backend gives this later, replace static
-            activeOpacity={1}
-          /> */}
+
             <CustomTile
               icon={<Flag />}
               title="Wind Direction"
               rightValue={`${latest.windDirection}°`}
+              color={
+                isExceeding(latest.windDirection, threshold.northDir) ||
+                isExceeding(latest.windDirection, threshold.southDir) ||
+                isExceeding(latest.windDirection, threshold.eastDir) ||
+                isExceeding(latest.windDirection, threshold.westDir)
+                  ? tempColor
+                  : undefined
+              }
               activeOpacity={1}
             />
           </>
