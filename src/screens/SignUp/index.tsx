@@ -98,6 +98,7 @@ export default function SignUpScreen({ navigation }: Props) {
     } else {
       if (validateStep2()) {
         try {
+          const deviceToken = await getDeviceToken();
           const payload = {
             firstName,
             lastName,
@@ -106,9 +107,8 @@ export default function SignUpScreen({ navigation }: Props) {
             confirmPassword,
             country: 'US',
             state: 'Florida',
-            // zoneId: 'FLZ139'!,
             zoneId: selectedZone!,
-            deviceToken: (await getDeviceToken()) ?? '',
+            deviceToken: deviceToken!,
           };
 
           const res = await signup(payload);

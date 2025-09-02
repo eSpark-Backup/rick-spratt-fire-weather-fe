@@ -44,6 +44,7 @@ const CustomTabBar: React.FC<CustomTabBarProps> = ({ navigation, state }) => {
   const handleLogout = async (navigateTo: string) => {
     try {
       await AsyncStorage.removeItem('authToken');
+      await AsyncStorage.removeItem('isUserLoggedIn');
       dispatch(logout());
     } catch (err) {
       console.error('Error clearing token:', err);
@@ -76,7 +77,7 @@ const CustomTabBar: React.FC<CustomTabBarProps> = ({ navigation, state }) => {
                   onPress: () => handleLogout(navigateTo),
                 },
               ],
-              { cancelable: true }
+              { cancelable: true },
             );
           } else if (currentScreen !== navigateTo) {
             navigation.navigate(navigateTo);
