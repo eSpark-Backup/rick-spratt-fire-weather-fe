@@ -6,6 +6,7 @@ require Pod::Executable.execute_command('node', ['-p',
   )', __dir__]).strip
 
 platform :ios, min_ios_version_supported
+use_modular_headers!
 prepare_react_native_project!
 
 linkage = ENV['USE_FRAMEWORKS']
@@ -15,6 +16,9 @@ if linkage != nil
 end
 
 target 'RickSprattFireWeatherAlertApp' do
+  use_frameworks! :linkage => :static
+  $RNFirebaseAsStaticFramework = true
+
   config = use_native_modules!
 
   use_react_native!(
@@ -23,6 +27,10 @@ target 'RickSprattFireWeatherAlertApp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  pod 'Firebase/Core'
+  pod 'Firebase/Auth'
+  pod 'Firebase/Firestore'
+  
   post_install do |installer|
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(

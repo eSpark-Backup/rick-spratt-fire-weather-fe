@@ -94,7 +94,7 @@ export default function HomeScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 12 }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -212,7 +212,7 @@ export default function HomeScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 12,
+    // padding: 12,
     backgroundColor: bgColor,
   },
   commentTile: {

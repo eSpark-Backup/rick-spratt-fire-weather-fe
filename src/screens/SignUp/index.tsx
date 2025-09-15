@@ -108,9 +108,11 @@ export default function SignUpScreen({ navigation }: Props) {
             country: 'US',
             state: 'Florida',
             zoneId: selectedZone!,
-            deviceToken: deviceToken!,
+            deviceToken: typeof deviceToken === 'string' ? deviceToken : '',
           };
 
+          console.log("payload", payload, deviceToken);
+          
           const res = await signup(payload);
 
           if (res.success) {
