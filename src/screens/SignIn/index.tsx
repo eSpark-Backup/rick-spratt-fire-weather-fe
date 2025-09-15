@@ -205,11 +205,12 @@ export default function SignInScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    // padding: 20,
     backgroundColor: bgColor,
   },
   keyboardView: {
     flex: 1,
+    paddingHorizontal: 20
   },
   title: {
     paddingVertical: '5%',

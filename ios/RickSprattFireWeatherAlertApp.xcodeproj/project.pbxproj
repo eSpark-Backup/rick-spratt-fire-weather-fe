@@ -22,6 +22,7 @@
 
 /* Begin PBXFileReference section */
 		043652F72E681B9200033A2E /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		047E329B2E780CF600613922 /* RickSprattFireWeatherAlertApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = RickSprattFireWeatherAlertApp.entitlements; path = RickSprattFireWeatherAlertApp/RickSprattFireWeatherAlertApp.entitlements; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* RickSprattFireWeatherAlertApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RickSprattFireWeatherAlertApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = RickSprattFireWeatherAlertApp/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = RickSprattFireWeatherAlertApp/Info.plist; sourceTree = "<group>"; };
@@ -54,6 +55,7 @@
 		13B07FAE1A68108700A75B9A /* RickSprattFireWeatherAlertApp */ = {
 			isa = PBXGroup;
 			children = (
+				047E329B2E780CF600613922 /* RickSprattFireWeatherAlertApp.entitlements */,
 				043652F72E681B9200033A2E /* GoogleService-Info.plist */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
@@ -315,7 +317,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = RickSprattFireWeatherAlertApp/RickSprattFireWeatherAlertApp.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3LS444UDS9;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = RickSprattFireWeatherAlertApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
@@ -343,7 +347,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = RickSprattFireWeatherAlertApp/RickSprattFireWeatherAlertApp.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3LS444UDS9;
 				INFOPLIST_FILE = RickSprattFireWeatherAlertApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
