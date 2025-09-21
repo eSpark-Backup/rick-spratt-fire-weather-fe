@@ -19,7 +19,6 @@ import {
   getThermostats,
   setThermostats,
   Threshold,
-  ThresholdPayload,
 } from '../../services/thermostatService';
 
 const SETTINGS_CONFIG = [
@@ -36,7 +35,7 @@ const SETTINGS_CONFIG = [
   {
     key: 'humidity',
     icon: Droplet,
-    title: 'Set Humidity',
+    title: 'Set Rh',
     unit: '%',
     defaultValue: 60,
     isKBDI: false,
@@ -247,7 +246,7 @@ export default function SettingsScreen() {
     }
   };
 
-  const collectCurrentThresholdData = (): ThresholdPayload => {
+  const collectCurrentThresholdData = (): Threshold => {
     const thresholdData: Partial<Threshold> = {};
 
     settings.forEach(setting => {
@@ -272,7 +271,7 @@ export default function SettingsScreen() {
       }
     });
 
-    const completeThresholdData: ThresholdPayload = {
+    const completeThresholdData: Threshold = {
       temperature: thresholdData.temperature ?? 80,
       humidity: thresholdData.humidity ?? 60,
       windSpeed: thresholdData.windSpeed ?? 15,

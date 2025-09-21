@@ -1,27 +1,42 @@
 import api from './api';
 
-export interface Threshold {
-  id: string;
-  userId: string;
+export type Threshold = {
   temperature: number;
   humidity: number;
-  windSpeed: number;
-  southDir: number;
-  northDir: number;
-  eastDir: number;
-  westDir: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export type ThresholdPayload = {
-  temperature: number;
-  humidity: number;
-  windSpeed: number;
-  southDir: number;
-  northDir: number;
-  eastDir: number;
-  westDir: number;
+  wind_speed: {
+    N: {
+      min: number;
+      max: number;
+    };
+    NE: {
+      min: number;
+      max: number;
+    };
+    E: {
+      min: number;
+      max: number;
+    };
+    SE: {
+      min: number;
+      max: number;
+    };
+    S: {
+      min: number;
+      max: number;
+    };
+    SW: {
+      min: number;
+      max: number;
+    };
+    W: {
+      min: number;
+      max: number;
+    };
+    NW: {
+      min: number;
+      max: number;
+    };
+  };
 };
 
 export const getThermostats = async (): Promise<{
@@ -29,11 +44,12 @@ export const getThermostats = async (): Promise<{
   message: string;
 }> => {
   const response = await api.get('/threshold');
-  return response.data;
+  console.log('🚀 ~ getThermostats ~ response:', response);
+  return response.data.data;
 };
 
 export const setThermostats = async (
-  payload: ThresholdPayload,
+  payload: Threshold,
 ): Promise<{ message: string }> => {
   const response = await api.post('/threshold', payload);
   return response.data;

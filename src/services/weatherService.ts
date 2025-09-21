@@ -2,10 +2,10 @@ import api from './api'; // <-- your axios instance
 
 export interface WeatherObservation {
   timestamp: string;
-  temperature: number;
-  Humidity: number;
+  temperatureF: number;
+  relativeHumidity: number;
   windDirection: number;
-  windSpeed: number;
+  windSpeedMph: number;
 }
 
 export interface WeatherMeta {
@@ -29,9 +29,9 @@ export const fetchWeatherObservations = async (
 ): Promise<WeatherObservation[]> => {
   try {
     const response = await api.get<WeatherResponse>(
-      `/weather/zones/forecast/${zoneId}/observations`,
+      `/weather/zones/forecast/${zoneId}/observations?limit=1`,
     );
-
+    console.log('Fetched weather observations:', response.data.data.weather);
     return response.data.data.weather;
   } catch (error: any) {
     console.error('Error fetching weather observations:', error);
