@@ -1,11 +1,13 @@
 import api from './api'; // <-- your axios instance
 
+export type WindDirection = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW';
+
 export interface WeatherObservation {
   timestamp: string;
   temperatureF: number;
   relativeHumidity: number;
-  windDirection: number;
-  windSpeedMph: number;
+  windDirection: WindDirection;
+  windSpeed: number;
 }
 
 export interface WeatherMeta {

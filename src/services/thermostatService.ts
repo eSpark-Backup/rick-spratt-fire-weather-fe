@@ -44,8 +44,8 @@ export const getThermostats = async (): Promise<{
   message: string;
 }> => {
   const response = await api.get('/threshold');
-  console.log('🚀 ~ getThermostats ~ response:', response);
-  return response.data.data;
+  console.log('🚀 ~ getThermostats ~ response:', response.data.data);
+  return response.data;
 };
 
 export const setThermostats = async (

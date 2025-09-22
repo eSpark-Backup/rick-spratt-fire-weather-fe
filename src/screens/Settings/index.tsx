@@ -42,15 +42,6 @@ const SETTINGS_CONFIG = [
     enabled: true,
   },
   {
-    key: 'windSpeed',
-    icon: Wind,
-    title: 'Set Wind Speed',
-    unit: ' mph',
-    defaultValue: 15,
-    isKBDI: false,
-    enabled: true,
-  },
-  {
     key: 'kbdi',
     icon: PlantKBDI,
     title: 'Set KBDI',
@@ -63,10 +54,50 @@ const SETTINGS_CONFIG = [
 ];
 
 const WIND_DIRECTIONS_CONFIG = [
-  { key: 'southDir', direction: 'South', defaultValue: 75 },
-  { key: 'northDir', direction: 'North', defaultValue: 75 },
-  { key: 'westDir', direction: 'West', defaultValue: 75 },
-  { key: 'eastDir', direction: 'East', defaultValue: 75 },
+  {
+    key: 'N',
+    type: 'range',
+    direction: 'North',
+    defaultMin: 0,
+    defaultMax: 10,
+  },
+  {
+    key: 'NE',
+    type: 'range',
+    direction: 'North-East',
+    defaultMin: 0,
+    defaultMax: 10,
+  },
+  { key: 'E', type: 'range', direction: 'East', defaultMin: 0, defaultMax: 10 },
+  {
+    key: 'SE',
+    type: 'range',
+    direction: 'South-East',
+    defaultMin: 0,
+    defaultMax: 10,
+  },
+  {
+    key: 'S',
+    type: 'range',
+    direction: 'South',
+    defaultMin: 0,
+    defaultMax: 10,
+  },
+  {
+    key: 'SW',
+    type: 'range',
+    direction: 'South-West',
+    defaultMin: 0,
+    defaultMax: 10,
+  },
+  { key: 'W', type: 'range', direction: 'West', defaultMin: 0, defaultMax: 10 },
+  {
+    key: 'NW',
+    type: 'range',
+    direction: 'North-West',
+    defaultMin: 0,
+    defaultMax: 10,
+  },
 ];
 
 const { width, height } = Dimensions.get('screen');
@@ -105,10 +136,12 @@ export default function SettingsScreen() {
   const initializeWindDirections = () => {
     return WIND_DIRECTIONS_CONFIG.map(config => ({
       icon: <Flag />,
-      title: `Set ${config.direction} Direction`,
-      rightValue: `Above ${config.defaultValue}`,
-      value: config.defaultValue,
+      title: `Set ${config.direction} Wind`,
+      rightValue: `${config.defaultMin}-${config.defaultMax} mph`,
+      minValue: config.defaultMin,
+      maxValue: config.defaultMax,
       key: config.key,
+      type: config.type,
     }));
   };
 
@@ -170,21 +203,23 @@ export default function SettingsScreen() {
       }),
     );
 
-    setWindDirections(prev =>
-      prev.map(item => {
-        const apiValue = data[item.key as keyof Threshold];
-        if (apiValue !== undefined && apiValue !== null) {
-          const numericValue =
-            typeof apiValue === 'string' ? parseFloat(apiValue) : apiValue;
-          return {
-            ...item,
-            value: numericValue,
-            rightValue: `Above ${numericValue}`,
-          };
-        }
-        return item;
-      }),
-    );
+    if (data.wind_speed) {
+      setWindDirections(prev =>
+        prev.map(item => {
+          const windApiValue =
+            data.wind_speed[item.key as keyof typeof data.wind_speed];
+          if (windApiValue) {
+            return {
+              ...item,
+              minValue: windApiValue.min,
+              maxValue: windApiValue.max,
+              rightValue: `${windApiValue.min}-${windApiValue.max} mph`,
+            };
+          }
+          return item;
+        }),
+      );
+    }
   };
 
   const handleTilePress = (setting: any) => {
@@ -193,6 +228,8 @@ export default function SettingsScreen() {
       value: setting.value,
       minValue: setting.minValue,
       maxValue: setting.maxValue,
+      type:
+        setting.type || (setting.minValue !== undefined ? 'range' : 'value'),
     });
     setModalVisible(true);
   };
@@ -203,6 +240,7 @@ export default function SettingsScreen() {
   ) => {
     const config = SETTINGS_CONFIG.find(c => c.key === key);
 
+    // Handle main settings (temp, humidity, KBDI)
     if (config && config.enabled) {
       setSettings(prev =>
         prev.map(item => {
@@ -213,15 +251,12 @@ export default function SettingsScreen() {
                 minValue: value.min,
                 maxValue: value.max,
                 rightValue: `${value.min}-${value.max}`,
-                value: undefined,
               } as KBDISetting;
             } else if (!config.isKBDI && typeof value === 'number') {
               return {
                 ...item,
                 value: value,
                 rightValue: `${value}${config.unit}`,
-                minValue: undefined,
-                maxValue: undefined,
               } as ValueSetting;
             }
           }
@@ -230,15 +265,17 @@ export default function SettingsScreen() {
       );
     }
 
+    // Handle wind directions
     const windConfig = WIND_DIRECTIONS_CONFIG.find(c => c.key === key);
-    if (windConfig && typeof value === 'number') {
+    if (windConfig && typeof value === 'object') {
       setWindDirections(prev =>
         prev.map(item =>
           item.key === key
             ? {
                 ...item,
-                value: value,
-                rightValue: `Above ${value}`,
+                minValue: value.min,
+                maxValue: value.max,
+                rightValue: `${value.min}-${value.max} mph`,
               }
             : item,
         ),
@@ -247,41 +284,33 @@ export default function SettingsScreen() {
   };
 
   const collectCurrentThresholdData = (): Threshold => {
-    const thresholdData: Partial<Threshold> = {};
+    const thresholdData: Threshold = {
+      temperature: settings.find(s => s.key === 'temperature')?.value ?? 80,
+      humidity: settings.find(s => s.key === 'humidity')?.value ?? 60,
+      wind_speed: {
+        N: { min: 0, max: 0 },
+        NE: { min: 0, max: 0 },
+        E: { min: 0, max: 0 },
+        SE: { min: 0, max: 0 },
+        S: { min: 0, max: 0 },
+        SW: { min: 0, max: 0 },
+        W: { min: 0, max: 0 },
+        NW: { min: 0, max: 0 },
+      },
+    };
 
-    settings.forEach(setting => {
-      if ('value' in setting && setting.value !== undefined) {
-        (thresholdData as any)[setting.key] = setting.value;
-      } else if (
-        'minValue' in setting &&
-        'maxValue' in setting &&
-        setting.minValue !== undefined &&
-        setting.maxValue !== undefined
-      ) {
-        (thresholdData as any)[setting.key] = {
-          min: setting.minValue,
-          max: setting.maxValue,
+    windDirections.forEach(dir => {
+      if (dir.minValue !== undefined && dir.maxValue !== undefined) {
+        thresholdData.wind_speed[
+          dir.key as keyof typeof thresholdData.wind_speed
+        ] = {
+          min: dir.minValue,
+          max: dir.maxValue,
         };
       }
     });
 
-    windDirections.forEach(direction => {
-      if (direction.value !== undefined) {
-        (thresholdData as any)[direction.key] = direction.value;
-      }
-    });
-
-    const completeThresholdData: Threshold = {
-      temperature: thresholdData.temperature ?? 80,
-      humidity: thresholdData.humidity ?? 60,
-      windSpeed: thresholdData.windSpeed ?? 15,
-      southDir: thresholdData.southDir ?? 75,
-      northDir: thresholdData.northDir ?? 75,
-      eastDir: thresholdData.eastDir ?? 75,
-      westDir: thresholdData.westDir ?? 75,
-    };
-
-    return completeThresholdData;
+    return thresholdData;
   };
 
   const handleSetThreshold = async () => {

@@ -47,7 +47,6 @@ export default function HomeScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [threshold, setThreshold] = useState<Threshold | null>(null);
-
   const zoneId = useSelector((state: RootState) => state.auth.user?.zoneId);
 
   const loadWeather = async (isRefresh = false) => {
@@ -157,32 +156,39 @@ export default function HomeScreen({ navigation }: Props) {
             />
             <CustomTileDual
               activeOpacity={1}
-              onPress={() => {}}
               color={
-                isExceeding(latest.windSpeedMph, threshold.wind_speed)
+                latest.windSpeed >
+                  threshold.wind_speed[latest.windDirection].max ||
+                latest.windSpeed <
+                  threshold.wind_speed[latest.windDirection].min
                   ? tempColor
                   : coolColor
               }
               topTile={{
-                icon: isExceeding(latest.windSpeedMph, threshold.wind_speed) ? (
-                  <WindHot />
-                ) : (
-                  <Wind />
-                ),
+                icon:
+                  latest.windSpeed >
+                    threshold.wind_speed[latest.windDirection].max ||
+                  latest.windSpeed <
+                    threshold.wind_speed[latest.windDirection].min ? (
+                    <WindHot />
+                  ) : (
+                    <Wind />
+                  ),
                 title: 'Wind Speed',
-                rightValue: `${latest.windSpeedMph?.toFixed(1)} mph`,
+                rightValue: `${latest.windSpeed.toFixed(1)} mph`,
               }}
               bottomTile={{
-                icon: isExceeding(
-                  latest.windDirection,
-                  threshold.wind_speed.E.min,
-                ) ? (
-                  <FlagRed />
-                ) : (
-                  <Flag />
-                ),
+                icon:
+                  latest.windSpeed >
+                    threshold.wind_speed[latest.windDirection].max ||
+                  latest.windSpeed <
+                    threshold.wind_speed[latest.windDirection].min ? (
+                    <FlagRed />
+                  ) : (
+                    <Flag />
+                  ),
                 title: 'Wind Direction',
-                rightValue: `${latest.windDirection} °`,
+                rightValue: latest.windDirection, // ✅ directly use "N", "E", "NE", etc.
               }}
             />
           </>

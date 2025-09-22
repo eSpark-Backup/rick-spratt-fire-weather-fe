@@ -21,14 +21,15 @@ export default function SettingsEditModal({
   const [inputValue, setInputValue] = useState<string>('');
   const [minValue, setMinValue] = useState<string>('');
   const [maxValue, setMaxValue] = useState<string>('');
-
+  // In SettingsEditModal
+  const isRangeSetting = setting?.key === 'kbdi' || setting?.type === 'range';
   useEffect(() => {
     if (setting) {
-      if (setting.key === 'kbdi') {
+      if (isRangeSetting) {
         setMinValue(setting.minValue?.toString() || '0');
         setMaxValue(setting.maxValue?.toString() || '0');
       } else {
-        setInputValue(setting.value.toString());
+        setInputValue(setting.value?.toString());
       }
     }
   }, [setting]);
@@ -36,17 +37,17 @@ export default function SettingsEditModal({
   if (!setting) return null;
 
   const handleIncrement = (type?: 'min' | 'max') => {
-    if (setting.key === 'kbdi') {
+    if (isRangeSetting) {
       if (type === 'min') {
         const newVal = (parseFloat(minValue) || 0) + 1;
-        setMinValue(newVal.toString());
+        setMinValue(newVal?.toString());
         onValueChange?.(setting.key, {
           min: newVal,
           max: parseFloat(maxValue) || 0,
         });
       } else {
         const newVal = (parseFloat(maxValue) || 0) + 1;
-        setMaxValue(newVal.toString());
+        setMaxValue(newVal?.toString());
         onValueChange?.(setting.key, {
           min: parseFloat(minValue) || 0,
           max: newVal,
@@ -54,23 +55,23 @@ export default function SettingsEditModal({
       }
     } else {
       const newVal = (parseFloat(inputValue) || 0) + 1;
-      setInputValue(newVal.toString());
+      setInputValue(newVal?.toString());
       onValueChange?.(setting.key, newVal);
     }
   };
 
   const handleDecrement = (type?: 'min' | 'max') => {
-    if (setting.key === 'kbdi') {
+    if (isRangeSetting) {
       if (type === 'min') {
         const newVal = (parseFloat(minValue) || 0) - 1;
-        setMinValue(newVal.toString());
+        setMinValue(newVal?.toString());
         onValueChange?.(setting.key, {
           min: newVal,
           max: parseFloat(maxValue) || 0,
         });
       } else {
         const newVal = (parseFloat(maxValue) || 0) - 1;
-        setMaxValue(newVal.toString());
+        setMaxValue(newVal?.toString());
         onValueChange?.(setting.key, {
           min: parseFloat(minValue) || 0,
           max: newVal,
@@ -78,13 +79,13 @@ export default function SettingsEditModal({
       }
     } else {
       const newVal = (parseFloat(inputValue) || 0) - 1;
-      setInputValue(newVal.toString());
+      setInputValue(newVal?.toString());
       onValueChange?.(setting.key, newVal);
     }
   };
 
   const handleChange = (text: string, type?: 'min' | 'max') => {
-    if (setting.key === 'kbdi') {
+    if (isRangeSetting) {
       if (type === 'min') {
         setMinValue(text);
         const parsed = parseFloat(text);
@@ -132,7 +133,7 @@ export default function SettingsEditModal({
             </CustomText>
           </View>
 
-          {setting.key === 'kbdi' ? (
+          {isRangeSetting ? (
             <>
               {/* Min */}
               <View style={styles.labeledRow}>

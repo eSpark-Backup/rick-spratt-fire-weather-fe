@@ -157,6 +157,7 @@ export type SettingEdit = {
   minValue?: number;
   maxValue?: number;
   key: string;
+  type?: 'value' | 'range';
 };
 
 export type SettingsEditModalProps = {
