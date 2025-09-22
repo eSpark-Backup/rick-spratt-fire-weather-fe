@@ -6,6 +6,8 @@ import {
   RefreshControl,
   ScrollView,
 } from 'react-native';
+import { useSelector } from 'react-redux';
+
 import { RootStackNavigationProp } from '../../navigation/navigation';
 import CustomTile from '../../components/CustomTile';
 import ColoredTile from '../../components/ColoredTIle';
@@ -21,15 +23,20 @@ import {
   DropletHot,
   FlagRed,
 } from '../../assets';
-import { bgColor, tempColor } from '../../constants/colors';
+import {
+  bgColor,
+  coolColor,
+  primaryColor,
+  tempColor,
+} from '../../constants/colors';
 import {
   WeatherObservation,
   fetchWeatherObservations,
 } from '../../services/weatherService';
-import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { Threshold, getThermostats } from '../../services/thermostatService';
-import { isExceeding } from '../../utils/isexceeding';
+import { isExceeding, isLessThan } from '../../utils/isexceeding';
+import CustomTileDual from '../../components/CustomTileDual';
 
 type Props = { navigation: RootStackNavigationProp<'HomeTabs'> };
 
@@ -40,7 +47,6 @@ export default function HomeScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [threshold, setThreshold] = useState<Threshold | null>(null);
-
   const zoneId = useSelector((state: RootState) => state.auth.user?.zoneId);
 
   const loadWeather = async (isRefresh = false) => {
@@ -106,7 +112,7 @@ export default function HomeScreen({ navigation }: Props) {
         {loading && (
           <ActivityIndicator
             size="large"
-            color={tempColor}
+            color={primaryColor}
             style={{ marginBottom: '7%' }}
           />
         )}
@@ -115,80 +121,75 @@ export default function HomeScreen({ navigation }: Props) {
           <>
             <CustomTile
               icon={
-                isExceeding(latest.temperature, threshold.temperature) ? (
+                isExceeding(latest.temperatureF, threshold.temperature) ? (
                   <CloudHot />
                 ) : (
                   <CloudCool />
                 )
               }
               title="Temperature"
-              rightValue={`${latest.temperature}°C`}
+              rightValue={`${latest.temperatureF} °F`}
               color={
-                isExceeding(latest.temperature, threshold.temperature)
+                isExceeding(latest.temperatureF, threshold.temperature)
                   ? tempColor
-                  : undefined
+                  : coolColor
               }
               activeOpacity={1}
             />
 
             <CustomTile
               icon={
-                isExceeding(latest.Humidity, threshold.humidity) ? (
+                isLessThan(latest.relativeHumidity, threshold.humidity) ? (
                   <DropletHot />
                 ) : (
                   <Droplet />
                 )
               }
-              title="Humidity"
-              rightValue={`${latest.Humidity?.toFixed(0)}%`}
+              title="Rh"
+              rightValue={`${latest.relativeHumidity?.toFixed(0)} %`}
               color={
-                isExceeding(latest.Humidity, threshold.humidity)
+                isLessThan(latest.relativeHumidity, threshold.humidity)
                   ? tempColor
-                  : undefined
+                  : coolColor
               }
               activeOpacity={1}
             />
-
-            <CustomTile
-              icon={
-                isExceeding(latest.windSpeed, threshold.windSpeed) ? (
-                  <WindHot />
-                ) : (
-                  <Wind />
-                )
-              }
-              title="Wind Speed"
-              rightValue={`${latest.windSpeed?.toFixed(1)} mph`}
-              color={
-                isExceeding(latest.windSpeed, threshold.windSpeed)
-                  ? tempColor
-                  : undefined
-              }
+            <CustomTileDual
               activeOpacity={1}
-            />
-
-            <CustomTile
-              icon={
-                isExceeding(latest.windDirection, threshold.northDir) ||
-                isExceeding(latest.windDirection, threshold.southDir) ||
-                isExceeding(latest.windDirection, threshold.eastDir) ||
-                isExceeding(latest.windDirection, threshold.westDir) ? (
-                  <FlagRed />
-                ) : (
-                  <Flag />
-                )
-              }
-              title="Wind Direction"
-              rightValue={`${latest.windDirection}°`}
               color={
-                isExceeding(latest.windDirection, threshold.northDir) ||
-                isExceeding(latest.windDirection, threshold.southDir) ||
-                isExceeding(latest.windDirection, threshold.eastDir) ||
-                isExceeding(latest.windDirection, threshold.westDir)
+                latest.windSpeed >
+                  threshold.wind_speed[latest.windDirection].max ||
+                latest.windSpeed <
+                  threshold.wind_speed[latest.windDirection].min
                   ? tempColor
-                  : undefined
+                  : coolColor
               }
-              activeOpacity={1}
+              topTile={{
+                icon:
+                  latest.windSpeed >
+                    threshold.wind_speed[latest.windDirection].max ||
+                  latest.windSpeed <
+                    threshold.wind_speed[latest.windDirection].min ? (
+                    <WindHot />
+                  ) : (
+                    <Wind />
+                  ),
+                title: 'Wind Speed',
+                rightValue: `${latest.windSpeed.toFixed(1)} mph`,
+              }}
+              bottomTile={{
+                icon:
+                  latest.windSpeed >
+                    threshold.wind_speed[latest.windDirection].max ||
+                  latest.windSpeed <
+                    threshold.wind_speed[latest.windDirection].min ? (
+                    <FlagRed />
+                  ) : (
+                    <Flag />
+                  ),
+                title: 'Wind Direction',
+                rightValue: latest.windDirection, // ✅ directly use "N", "E", "NE", etc.
+              }}
             />
           </>
         )}
@@ -212,7 +213,6 @@ export default function HomeScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // padding: 12,
     backgroundColor: bgColor,
   },
   commentTile: {

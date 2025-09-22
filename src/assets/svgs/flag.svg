@@ -3,7 +3,7 @@
     <circle cx="18.2799" cy="18.4927" r="17.6179" fill="#B3D0D8" />
     <rect x="3.1106" y="3.7912" width="30.5491" height="30.5491" fill="url(#pattern0_9_513)" />
     <defs>
-        <pattern id="pattern0_9_513" patternContentUnits="objectBoundingBox" width="1" height="1">
+        <pattern id="pattern0_9_513" patternContentUnits="objectBoundingBox" width="1" height="0.9" x="4.1106" y="3.7912">
             <use xlink:href="#image0_9_513" transform="scale(0.00390625)" />
         </pattern>
         <image id="image0_9_513" width="256" height="256" preserveAspectRatio="none"
