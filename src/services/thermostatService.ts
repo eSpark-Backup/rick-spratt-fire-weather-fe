@@ -4,6 +4,10 @@ type direction = number;
 export type Threshold = {
   temperature: number;
   humidity: number;
+  kbdi: {
+    min: number;
+    max: number;
+  };
   wind_speed: {
     N: {
       min: direction;
