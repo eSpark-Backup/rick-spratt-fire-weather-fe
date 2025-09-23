@@ -72,6 +72,7 @@ export default function HomeScreen({ navigation }: Props) {
     if (zoneId) {
       loadWeather();
     }
+    console.log('🚀 ~ HomeScreen ~ zoneId:', zoneId);
   }, [zoneId]);
 
   const loadThresholds = async () => {
@@ -107,8 +108,10 @@ export default function HomeScreen({ navigation }: Props) {
 
   const isOutOfRange =
     isThresholdSet &&
-    (latest!.windSpeed > dirThreshold!.max ||
-      latest!.windSpeed < dirThreshold!.min);
+    latest &&
+    dirThreshold &&
+    (latest.windSpeed > dirThreshold.max ||
+      latest.windSpeed < dirThreshold.min);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -134,16 +137,16 @@ export default function HomeScreen({ navigation }: Props) {
           <>
             <CustomTile
               icon={
-                isExceeding(latest.temperatureF, threshold.temperature) ? (
+                isExceeding(latest.temperature, threshold.temperature) ? (
                   <CloudHot />
                 ) : (
                   <CloudCool />
                 )
               }
               title="Temperature"
-              rightValue={`${latest.temperatureF} °F`}
+              rightValue={`${latest.temperature} °F`}
               color={
-                isExceeding(latest.temperatureF, threshold.temperature)
+                isExceeding(latest.temperature, threshold.temperature)
                   ? tempColor
                   : coolColor
               }
@@ -159,7 +162,7 @@ export default function HomeScreen({ navigation }: Props) {
                 )
               }
               title="Rh"
-              rightValue={`${latest.relativeHumidity?.toFixed(0)} %`}
+              rightValue={`${latest?.relativeHumidity?.toFixed(0)} %`}
               color={
                 isLessThan(latest.relativeHumidity, threshold.humidity)
                   ? tempColor
@@ -173,7 +176,7 @@ export default function HomeScreen({ navigation }: Props) {
               topTile={{
                 icon: isOutOfRange ? <WindHot /> : <Wind />,
                 title: 'Wind Speed',
-                rightValue: `${latest.windSpeed.toFixed(1)} mph`,
+                rightValue: `${latest?.windSpeed?.toFixed(1)} mph`,
               }}
               bottomTile={{
                 icon: isOutOfRange ? <FlagRed /> : <Flag />,

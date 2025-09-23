@@ -21,7 +21,11 @@ import { signup } from '../../services/authService';
 import getDeviceToken from '../../utils/getDeviceToken';
 import { fetchZones, Zone } from '../../services/zoneService';
 import { useDispatch } from 'react-redux';
-import { setUser, setIsLoggedIn } from '../../redux/slices/authSlice';
+import {
+  setUser,
+  setIsLoggedIn,
+  updateUserZone,
+} from '../../redux/slices/authSlice';
 
 type Props = { navigation: RootStackNavigationProp<'SignUp'> };
 
@@ -36,50 +40,53 @@ export default function SignUpScreen({ navigation }: Props) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [country, setCountry] = useState('US');
   const [state, setState] = useState('Florida');
-  const [selectedZone, setSelectedZone] = useState<string | undefined>();
-  const [zones, setZones] = useState<Zone[]>([]);
-  const [loadingZones, setLoadingZones] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSuccessModalVisible, setSuccessModalVisible] = useState(false);
+  const dispatch = useDispatch();
 
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  // const [zones, setZones] = useState<Zone[]>([]);
+  // const [loadingZones, setLoadingZones] = useState(false);
+  // const [page, setPage] = useState(1);
+  // const [hasMore, setHasMore] = useState(true);
+  const [selectedZone, setSelectedZone] = useState<
+    { id: string; name: string } | undefined
+  >();
 
-  const loadZones = async (pageToLoad: number = 1) => {
-    if (loadingZones || !hasMore) return;
+  // const loadZones = async (pageToLoad: number = 1) => {
 
-    setLoadingZones(true);
-    try {
-      const limit = 10; // or whatever backend supports
-      const fetchedZones = await fetchZones('FL', 'fire', pageToLoad, limit);
+  //   if (loadingZones || !hasMore) return;
 
-      if (fetchedZones.length === 0) {
-        setHasMore(false); // no more data
-      } else {
-        setZones(prev => {
-          const merged = [...prev, ...fetchedZones];
-          // ✅ filter duplicates by id
-          return merged.filter(
-            (zone, index, self) =>
-              index === self.findIndex(z => z.id === zone.id),
-          );
-        });
-        setPage(pageToLoad);
-        if (fetchedZones.length < limit) setHasMore(false);
-      }
-    } catch (error) {
-      console.error('Error fetching zones:', error);
-    } finally {
-      setLoadingZones(false);
-    }
-  };
-  useEffect(() => {
-    loadZones();
-  }, []);
+  //   setLoadingZones(true);
+  //   try {
+  //     const limit = 10; // or whatever backend supports
+  //     const fetchedZones = await fetchZones('FL', 'fire', pageToLoad, limit);
+
+  //     if (fetchedZones.length === 0) {
+  //       setHasMore(false); // no more data
+  //     } else {
+  //       setZones(prev => {
+  //         const merged = [...prev, ...fetchedZones];
+  //         // ✅ filter duplicates by id
+  //         return merged.filter(
+  //           (zone, index, self) =>
+  //             index === self.findIndex(z => z.id === zone.id),
+  //         );
+  //       });
+  //       setPage(pageToLoad);
+  //       if (fetchedZones.length < limit) setHasMore(false);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching zones:', error);
+  //   } finally {
+  //     setLoadingZones(false);
+  //   }
+  // };
+  // useEffect(() => {
+  //   loadZones();
+  // }, []);
 
   // Error state
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const dispatch = useDispatch();
   // Modal state
-  const [isSuccessModalVisible, setSuccessModalVisible] = useState(false);
 
   const validateStep1 = () => {
     let newErrors: Record<string, string> = {};
@@ -125,7 +132,7 @@ export default function SignUpScreen({ navigation }: Props) {
             confirmPassword,
             country: 'US',
             state: 'Florida',
-            zoneId: selectedZone!,
+            zoneId: selectedZone?.id!,
             deviceToken: typeof deviceToken === 'string' ? deviceToken : '',
           };
 
@@ -270,18 +277,29 @@ export default function SignUpScreen({ navigation }: Props) {
                 >
                   Choose your Zone
                 </CustomText>
-                <CustomDropdown
-                  data={zones.map(z => ({ label: z.name, value: z.id }))}
-                  placeholder={
-                    loadingZones ? 'Loading Zones...' : 'Select Zone'
-                  }
-                  selectedValue={selectedZone}
-                  onSelect={item => setSelectedZone(item.value)}
-                  maxHeight={500}
-                  error={errors.zone}
-                  onEndReached={() => loadZones(page + 1)} // 👈 add this
-                  loading={loadingZones}
+                <CustomButton
+                  title="Select Zone"
+                  onPress={() => {
+                    navigation.navigate('ZoneSelection', {
+                      fromScreen: 'SignUp',
+                      onSelect: (zone: { id: string; name: string }) => {
+                        setSelectedZone({ id: zone.id, name: zone.name });
+                        dispatch(
+                          updateUserZone({
+                            zoneId: zone.id,
+                            zoneName: zone.name,
+                          }),
+                        );
+                        navigation.goBack();
+                      },
+                    });
+                  }}
                 />
+                {selectedZone && (
+                  <CustomText style={{ marginTop: 10 }}>
+                    Selected Zone: {selectedZone.name} ({selectedZone.id})
+                  </CustomText>
+                )}
               </View>
             )}
 

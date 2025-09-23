@@ -17,7 +17,7 @@ import {
   LocationIcon,
 } from '../assets';
 import CustomText from './CustomText';
-import { BottomTabNavigationProp } from '../navigation/navigation';
+import { CompositeNavProp } from '../navigation/navigation';
 import { selectedCountry, selectedState } from '../constants';
 import { labelColor } from '../constants/colors';
 import { DropdownItem, HeaderProps } from '../types';
@@ -35,7 +35,7 @@ const Header: React.FC<HeaderProps> = ({
   LeftIcon,
   onLeftPress,
 }) => {
-  const navigation = useNavigation<BottomTabNavigationProp>();
+  const navigation = useNavigation<CompositeNavProp>();
   const route = useRoute();
   const user = useSelector((state: RootState) => state.auth.user);
 
@@ -120,7 +120,12 @@ const Header: React.FC<HeaderProps> = ({
       console.log('Zone updated:', res);
 
       // ✅ update Redux store
-      dispatch(updateUserZone(item.value));
+      dispatch(
+        updateUserZone({
+          zoneId: item.value,
+          zoneName: item.label,
+        }),
+      );
     } catch (err) {
       console.error('Error updating zone:', err);
     }
@@ -135,9 +140,11 @@ const Header: React.FC<HeaderProps> = ({
   const routeName = route.name;
 
   // Screens where you want the simple back header
-  const simpleHeaderScreens = ['Notifications', 'Settings'];
+  const simpleHeaderScreens = ['Notifications', 'Settings', 'ZoneSelection'];
 
   if (simpleHeaderScreens.includes(routeName)) {
+    const title = routeName === 'ZoneSelection' ? 'Select Zone' : routeName;
+
     return (
       <View style={styles.simpleHeaderContainer}>
         <TouchableOpacity
@@ -146,22 +153,14 @@ const Header: React.FC<HeaderProps> = ({
         >
           <BackIcon width={15} height={15} />
         </TouchableOpacity>
-        <CustomText style={styles.titleText}>{routeName}</CustomText>
+        <CustomText style={styles.titleText}>{title}</CustomText>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <View style={styles.side}>
-        {/* {LeftIcon ? (
-          <TouchableOpacity onPress={navigation.goBack}>
-            <BackIcon />
-          </TouchableOpacity>
-        ) : (
-          <View style={styles.placeholder} />
-        )} */}
-      </View>
+      <View style={styles.side} />
 
       <View style={styles.center}>
         <CustomText
@@ -174,15 +173,18 @@ const Header: React.FC<HeaderProps> = ({
 
         <TouchableOpacity
           style={styles.locationContainer}
-          onPress={openDropdown}
-          ref={locationRef}
+          onPress={() =>
+            navigation.navigate('ZoneSelection', {
+              fromScreen: 'Home',
+            })
+          }
           activeOpacity={0.7}
         >
           <LocationIcon />
           <CustomText style={styles.locationCustomText}>
-            {user?.country}, {user?.state}, {selectedLocation.label}
+            {user?.country}, {user?.state}, {user?.zoneName}
           </CustomText>
-          {modalVisible ? <ArrowUp /> : <ArrowDown />}
+          <ArrowDown />
         </TouchableOpacity>
       </View>
 

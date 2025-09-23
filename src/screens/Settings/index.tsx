@@ -12,8 +12,20 @@ import CustomTile from '../../components/CustomTile';
 import CustomText from '../../components/CustomText';
 import CustomButton from '../../components/CustomButton';
 import SettingsEditModal from '../../components/SettingsEditModal';
-import { CloudHot, Droplet, Flag, PlantKBDI, Wind } from '../../assets';
-import { bgColor, tempColor } from '../../constants/colors';
+import {
+  CloudCool,
+  CloudHot,
+  Droplet,
+  Flag,
+  PlantKBDI,
+  Wind,
+} from '../../assets';
+import {
+  bgColor,
+  coolColor,
+  primaryColor,
+  tempColor,
+} from '../../constants/colors';
 import { Setting, KBDISetting, ValueSetting } from '../../types';
 import {
   getThermostats,
@@ -24,10 +36,10 @@ import {
 const SETTINGS_CONFIG = [
   {
     key: 'temperature',
-    icon: CloudHot,
+    icon: CloudCool,
     title: 'Set Temperature',
-    unit: '°C',
-    color: tempColor,
+    unit: ' °F',
+    color: coolColor,
     defaultValue: 80,
     isKBDI: false,
     enabled: true,
@@ -36,7 +48,7 @@ const SETTINGS_CONFIG = [
     key: 'humidity',
     icon: Droplet,
     title: 'Set Rh',
-    unit: '%',
+    unit: ' %',
     defaultValue: 60,
     isKBDI: false,
     enabled: true,

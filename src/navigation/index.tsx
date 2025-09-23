@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import {
   ActivityIndicator,
   SafeAreaView,
   StyleSheet,
+  TouchableOpacity,
   View,
 } from 'react-native';
 
@@ -15,6 +16,7 @@ import NotificationsScreen from '../screens/Notification';
 import SettingsScreen from '../screens/Settings';
 import SignInScreen from '../screens/SignIn';
 import SignUpScreen from '../screens/SignUp';
+import ZoneSelection from '../screens/ZoneSelection';
 import { getActiveRouteName, navigationRef } from './RootNavigation';
 import Header from '../components/Header';
 import { zoneData } from '../constants';
@@ -23,6 +25,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import CustomText from '../components/CustomText';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator();
@@ -55,6 +58,7 @@ function AppNavigator() {
   const [initialRoute, setInitialRoute] = useState<
     keyof RootStackParamList | null
   >(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
     checkToken();
@@ -95,6 +99,18 @@ function AppNavigator() {
         name="HomeTabs"
         component={HomeTabs}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ZoneSelection"
+        component={ZoneSelection}
+        options={{
+          presentation: 'modal',
+          animation: 'slide_from_bottom',
+          headerShown: true, // Change this to true
+          header: () => (
+            <Header username="" locations={[]} onLocationSelect={() => {}} /> // Add the Header component here
+          ),
+        }}
       />
     </Stack.Navigator>
   );

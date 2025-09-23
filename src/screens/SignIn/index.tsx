@@ -15,7 +15,7 @@ import CustomText from '../../components/CustomText';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
 import RadioButton from '../../components/RadioButton';
-import { bgColor, tempColor } from '../../constants/colors';
+import { bgColor, coolColor, tempColor } from '../../constants/colors';
 
 import { login, updateDeviceToken } from '../../services/authService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -179,7 +179,7 @@ export default function SignInScreen({ navigation }: Props) {
           {loading ? (
             <ActivityIndicator
               size="large"
-              color={tempColor}
+              color={coolColor}
               style={{ marginBottom: '6.5%' }}
             />
           ) : (
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
   },
   keyboardView: {
     flex: 1,
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
   },
   title: {
     paddingVertical: '5%',

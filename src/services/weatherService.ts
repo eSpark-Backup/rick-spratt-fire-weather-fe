@@ -4,7 +4,7 @@ export type WindDirection = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW';
 
 export interface WeatherObservation {
   timestamp: string;
-  temperatureF: number;
+  temperature: number;
   relativeHumidity: number;
   windDirection: WindDirection;
   windSpeed: number;
