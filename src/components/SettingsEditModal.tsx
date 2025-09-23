@@ -36,6 +36,15 @@ export default function SettingsEditModal({
 
   if (!setting) return null;
 
+  const handleClear = () => {
+    if (isRangeSetting) {
+      setMinValue('');
+      setMaxValue('');
+      onValueChange?.(setting.key, { min: 0, max: 0 });
+    }
+    onClose?.(); // close modal after clearing
+  };
+
   const handleIncrement = (type?: 'min' | 'max') => {
     if (isRangeSetting) {
       if (type === 'min') {
@@ -89,7 +98,7 @@ export default function SettingsEditModal({
       if (type === 'min') {
         setMinValue(text);
         const parsed = parseFloat(text);
-        if (!isNaN(parsed)) {
+        if (!isNaN(parsed) && parsed < (parseFloat(maxValue) || Infinity)) {
           onValueChange?.(setting.key, {
             min: parsed,
             max: parseFloat(maxValue) || 0,
@@ -98,7 +107,7 @@ export default function SettingsEditModal({
       } else {
         setMaxValue(text);
         const parsed = parseFloat(text);
-        if (!isNaN(parsed)) {
+        if (!isNaN(parsed) && parsed > (parseFloat(minValue) || -Infinity)) {
           onValueChange?.(setting.key, {
             min: parseFloat(minValue) || 0,
             max: parsed,
@@ -123,14 +132,21 @@ export default function SettingsEditModal({
       >
         <TouchableOpacity style={styles.modalContent} activeOpacity={1}>
           <View style={styles.header}>
-            {setting.icon}
-            <CustomText
-              style={styles.title}
-              fontFamily="Gilroy-Medium"
-              size={16}
-            >
-              {setting.title}
-            </CustomText>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              {setting.icon}
+              <CustomText
+                style={styles.title}
+                fontFamily="Gilroy-Medium"
+                size={16}
+              >
+                {setting.title}
+              </CustomText>
+            </View>
+            <TouchableOpacity style={styles.clearButton} onPress={handleClear}>
+              <CustomText fontFamily="Gilroy-Medium" style={styles.clearText}>
+                Clear
+              </CustomText>
+            </TouchableOpacity>
           </View>
 
           {isRangeSetting ? (
@@ -248,6 +264,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
+    justifyContent: 'space-between',
   },
   title: {
     marginLeft: 12,
@@ -289,5 +306,19 @@ const styles = StyleSheet.create({
     width: 45,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  clearButton: {
+    // marginTop: 20,
+    alignSelf: 'flex-end',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    backgroundColor: '#f5f5f5',
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  clearText: {
+    fontSize: 14,
+    color: '#d9534f', // red-ish for emphasis
   },
 });

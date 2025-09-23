@@ -8,6 +8,10 @@ interface AuthState {
   state?: string;
   zoneId?: string;
 }
+interface ZoneUpdate {
+  zoneId: string;
+  zoneName: string;
+}
 
 const initialState: AuthState = {
   isLoggedIn: false,
@@ -27,9 +31,10 @@ const authSlice = createSlice({
     setIsLoggedIn: (state, action: PayloadAction<boolean>) => {
       state.isLoggedIn = action.payload;
     },
-    updateUserZone(state, action: PayloadAction<string>) {
+    updateUserZone(state, action: PayloadAction<ZoneUpdate>) {
       if (state.user) {
-        state.user.zoneId = action.payload;
+        state.user.zoneId = action.payload.zoneId;
+        state.user.zoneName = action.payload.zoneName;
       }
     },
     logout: state => {

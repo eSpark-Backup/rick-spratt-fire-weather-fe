@@ -29,15 +29,15 @@ export interface ZoneResponse {
 export const fetchZones = async (
   area: string = 'FL',
   type: string = 'fire',
-  page?: number,
-  limit?: number,
+  page: number = 1,
+  limit: number = 30,
   effective?: string,
 ): Promise<Zone[]> => {
-  const params: Record<string, any> = { area, type };
+  const params: Record<string, any> = { area, type, page, limit, effective };
 
   //   if (page) params.page = page;
   //   if (limit) params.limit = limit;
-  //   if (effective) params.effective = effective;
+  if (effective) params.effective = effective;
 
   const response = await api.get<ZoneResponse>('/weather/zones', { params });
 

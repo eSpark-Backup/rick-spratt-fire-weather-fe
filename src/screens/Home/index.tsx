@@ -72,6 +72,7 @@ export default function HomeScreen({ navigation }: Props) {
     if (zoneId) {
       loadWeather();
     }
+    console.log('🚀 ~ HomeScreen ~ zoneId:', zoneId);
   }, [zoneId]);
 
   const loadThresholds = async () => {
@@ -97,6 +98,21 @@ export default function HomeScreen({ navigation }: Props) {
   // Get the most recent observation
   const latest = observations.length > 0 ? observations[0] : null;
 
+  const dir = latest?.windDirection;
+  const dirThreshold = threshold?.wind_speed[dir!];
+
+  const isThresholdSet =
+    dirThreshold?.min !== null &&
+    dirThreshold?.max !== null &&
+    !(dirThreshold?.min === 0 && dirThreshold?.max === 0);
+
+  const isOutOfRange =
+    isThresholdSet &&
+    latest &&
+    dirThreshold &&
+    (latest.windSpeed > dirThreshold.max ||
+      latest.windSpeed < dirThreshold.min);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -121,16 +137,16 @@ export default function HomeScreen({ navigation }: Props) {
           <>
             <CustomTile
               icon={
-                isExceeding(latest.temperatureF, threshold.temperature) ? (
+                isExceeding(latest.temperature, threshold.temperature) ? (
                   <CloudHot />
                 ) : (
                   <CloudCool />
                 )
               }
               title="Temperature"
-              rightValue={`${latest.temperatureF} °F`}
+              rightValue={`${latest.temperature} °F`}
               color={
-                isExceeding(latest.temperatureF, threshold.temperature)
+                isExceeding(latest.temperature, threshold.temperature)
                   ? tempColor
                   : coolColor
               }
@@ -146,7 +162,7 @@ export default function HomeScreen({ navigation }: Props) {
                 )
               }
               title="Rh"
-              rightValue={`${latest.relativeHumidity?.toFixed(0)} %`}
+              rightValue={`${latest?.relativeHumidity?.toFixed(0)} %`}
               color={
                 isLessThan(latest.relativeHumidity, threshold.humidity)
                   ? tempColor
@@ -156,39 +172,16 @@ export default function HomeScreen({ navigation }: Props) {
             />
             <CustomTileDual
               activeOpacity={1}
-              color={
-                latest.windSpeed >
-                  threshold.wind_speed[latest.windDirection].max ||
-                latest.windSpeed <
-                  threshold.wind_speed[latest.windDirection].min
-                  ? tempColor
-                  : coolColor
-              }
+              color={isOutOfRange ? tempColor : coolColor}
               topTile={{
-                icon:
-                  latest.windSpeed >
-                    threshold.wind_speed[latest.windDirection].max ||
-                  latest.windSpeed <
-                    threshold.wind_speed[latest.windDirection].min ? (
-                    <WindHot />
-                  ) : (
-                    <Wind />
-                  ),
+                icon: isOutOfRange ? <WindHot /> : <Wind />,
                 title: 'Wind Speed',
-                rightValue: `${latest.windSpeed.toFixed(1)} mph`,
+                rightValue: `${latest?.windSpeed?.toFixed(1)} mph`,
               }}
               bottomTile={{
-                icon:
-                  latest.windSpeed >
-                    threshold.wind_speed[latest.windDirection].max ||
-                  latest.windSpeed <
-                    threshold.wind_speed[latest.windDirection].min ? (
-                    <FlagRed />
-                  ) : (
-                    <Flag />
-                  ),
+                icon: isOutOfRange ? <FlagRed /> : <Flag />,
                 title: 'Wind Direction',
-                rightValue: latest.windDirection, // ✅ directly use "N", "E", "NE", etc.
+                rightValue: latest.windDirection,
               }}
             />
           </>

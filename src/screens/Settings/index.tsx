@@ -12,8 +12,20 @@ import CustomTile from '../../components/CustomTile';
 import CustomText from '../../components/CustomText';
 import CustomButton from '../../components/CustomButton';
 import SettingsEditModal from '../../components/SettingsEditModal';
-import { CloudHot, Droplet, Flag, PlantKBDI, Wind } from '../../assets';
-import { bgColor, tempColor } from '../../constants/colors';
+import {
+  CloudCool,
+  CloudHot,
+  Droplet,
+  Flag,
+  PlantKBDI,
+  Wind,
+} from '../../assets';
+import {
+  bgColor,
+  coolColor,
+  primaryColor,
+  tempColor,
+} from '../../constants/colors';
 import { Setting, KBDISetting, ValueSetting } from '../../types';
 import {
   getThermostats,
@@ -24,10 +36,10 @@ import {
 const SETTINGS_CONFIG = [
   {
     key: 'temperature',
-    icon: CloudHot,
+    icon: CloudCool,
     title: 'Set Temperature',
-    unit: '°C',
-    color: tempColor,
+    unit: ' °F',
+    color: coolColor,
     defaultValue: 80,
     isKBDI: false,
     enabled: true,
@@ -36,7 +48,7 @@ const SETTINGS_CONFIG = [
     key: 'humidity',
     icon: Droplet,
     title: 'Set Rh',
-    unit: '%',
+    unit: ' %',
     defaultValue: 60,
     isKBDI: false,
     enabled: true,
@@ -59,44 +71,56 @@ const WIND_DIRECTIONS_CONFIG = [
     type: 'range',
     direction: 'North',
     defaultMin: 0,
-    defaultMax: 10,
+    defaultMax: 0,
   },
   {
     key: 'NE',
     type: 'range',
     direction: 'North-East',
     defaultMin: 0,
-    defaultMax: 10,
+    defaultMax: 0,
   },
-  { key: 'E', type: 'range', direction: 'East', defaultMin: 0, defaultMax: 10 },
+  {
+    key: 'E',
+    type: 'range',
+    direction: 'East',
+    defaultMin: 0,
+    defaultMax: 0,
+  },
   {
     key: 'SE',
     type: 'range',
     direction: 'South-East',
     defaultMin: 0,
-    defaultMax: 10,
+    defaultMax: 0,
   },
   {
     key: 'S',
     type: 'range',
     direction: 'South',
     defaultMin: 0,
-    defaultMax: 10,
+    defaultMax: 0,
   },
   {
     key: 'SW',
     type: 'range',
     direction: 'South-West',
     defaultMin: 0,
-    defaultMax: 10,
+    defaultMax: 0,
   },
-  { key: 'W', type: 'range', direction: 'West', defaultMin: 0, defaultMax: 10 },
+  {
+    key: 'W',
+    type: 'range',
+    direction: 'West',
+    defaultMin: 0,
+    defaultMax: 0,
+  },
   {
     key: 'NW',
     type: 'range',
     direction: 'North-West',
     defaultMin: 0,
-    defaultMax: 10,
+    defaultMax: 0,
   },
 ];
 
@@ -133,7 +157,17 @@ export default function SettingsScreen() {
     });
   };
 
-  const initializeWindDirections = () => {
+  type WindDirectionSetting = {
+    icon: React.JSX.Element;
+    title: string;
+    rightValue: string;
+    minValue: number;
+    maxValue: number;
+    key: string;
+    type: string;
+  };
+
+  const initializeWindDirections = (): WindDirectionSetting[] => {
     return WIND_DIRECTIONS_CONFIG.map(config => ({
       icon: <Flag />,
       title: `Set ${config.direction} Wind`,
@@ -146,7 +180,7 @@ export default function SettingsScreen() {
   };
 
   const [settings, setSettings] = useState<Setting[]>(initializeSettings());
-  const [windDirections, setWindDirections] = useState(
+  const [windDirections, setWindDirections] = useState<WindDirectionSetting[]>(
     initializeWindDirections(),
   );
 
@@ -288,19 +322,24 @@ export default function SettingsScreen() {
       temperature: settings.find(s => s.key === 'temperature')?.value ?? 80,
       humidity: settings.find(s => s.key === 'humidity')?.value ?? 60,
       wind_speed: {
-        N: { min: 0, max: 0 },
-        NE: { min: 0, max: 0 },
-        E: { min: 0, max: 0 },
-        SE: { min: 0, max: 0 },
-        S: { min: 0, max: 0 },
-        SW: { min: 0, max: 0 },
-        W: { min: 0, max: 0 },
-        NW: { min: 0, max: 0 },
+        N: { max: 0, min: 0 },
+        NE: { max: 0, min: 0 },
+        E: { max: 0, min: 0 },
+        SE: { max: 0, min: 0 },
+        S: { max: 0, min: 0 },
+        SW: { max: 0, min: 0 },
+        W: { max: 0, min: 0 },
+        NW: { max: 0, min: 0 },
       },
     };
 
     windDirections.forEach(dir => {
-      if (dir.minValue !== undefined && dir.maxValue !== undefined) {
+      if (
+        dir.minValue !== undefined &&
+        dir.maxValue !== undefined &&
+        dir.minValue !== 0 &&
+        dir.maxValue !== 0
+      ) {
         thresholdData.wind_speed[
           dir.key as keyof typeof thresholdData.wind_speed
         ] = {

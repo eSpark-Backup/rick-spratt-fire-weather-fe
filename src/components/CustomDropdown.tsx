@@ -22,7 +22,9 @@ export default function CustomDropdown({
   maxHeight,
   error, // <-- new prop
   hasError = false,
-}: DropdownProps) {
+  onEndReached,
+  loading = false,
+}: DropdownProps & { onEndReached?: () => void; loading?: boolean }) {
   const [isVisible, setIsVisible] = useState(false);
   const [buttonLayout, setButtonLayout] = useState<LayoutRectangle | null>(
     null,
@@ -78,6 +80,8 @@ export default function CustomDropdown({
               }
             : undefined
         }
+        onEndReached={onEndReached} // 👈 load next page
+        loading={loading}
       />
     </View>
   );

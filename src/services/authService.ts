@@ -23,7 +23,7 @@ interface SignupPayload {
 
 export const login = async (payload: LoginPayload) => {
   const response = await api.post('/auth/login', payload);
-  // console.log(response);
+  console.log('login', response);
   return response.data;
 };
 
