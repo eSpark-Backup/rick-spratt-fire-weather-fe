@@ -40,13 +40,31 @@ export default function SignUpScreen({ navigation }: Props) {
   const [zones, setZones] = useState<Zone[]>([]);
   const [loadingZones, setLoadingZones] = useState(false);
 
-  const loadZones = async () => {
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
+  const loadZones = async (pageToLoad: number = 1) => {
+    if (loadingZones || !hasMore) return;
+
     setLoadingZones(true);
     try {
-      const fetchedZones = await fetchZones('FL', 'fire');
-      console.log(zones);
+      const limit = 10; // or whatever backend supports
+      const fetchedZones = await fetchZones('FL', 'fire', pageToLoad, limit);
 
-      setZones(fetchedZones);
+      if (fetchedZones.length === 0) {
+        setHasMore(false); // no more data
+      } else {
+        setZones(prev => {
+          const merged = [...prev, ...fetchedZones];
+          // ✅ filter duplicates by id
+          return merged.filter(
+            (zone, index, self) =>
+              index === self.findIndex(z => z.id === zone.id),
+          );
+        });
+        setPage(pageToLoad);
+        if (fetchedZones.length < limit) setHasMore(false);
+      }
     } catch (error) {
       console.error('Error fetching zones:', error);
     } finally {
@@ -111,8 +129,8 @@ export default function SignUpScreen({ navigation }: Props) {
             deviceToken: typeof deviceToken === 'string' ? deviceToken : '',
           };
 
-          console.log("payload", payload, deviceToken);
-          
+          console.log('payload', payload, deviceToken);
+
           const res = await signup(payload);
 
           if (res.success) {
@@ -261,6 +279,8 @@ export default function SignUpScreen({ navigation }: Props) {
                   onSelect={item => setSelectedZone(item.value)}
                   maxHeight={500}
                   error={errors.zone}
+                  onEndReached={() => loadZones(page + 1)} // 👈 add this
+                  loading={loadingZones}
                 />
               </View>
             )}

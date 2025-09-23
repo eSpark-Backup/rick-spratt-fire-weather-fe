@@ -5,6 +5,7 @@ import {
   Modal,
   FlatList,
   StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
 
 import CustomText from './CustomText';
@@ -20,7 +21,12 @@ export default function DropdownModal({
   position,
   maxHeight = 400,
   width,
-}: DropdownModalProps) {
+  onEndReached,
+  loading = false,
+}: DropdownModalProps & {
+  onEndReached?: () => void;
+  loading?: boolean;
+}) {
   return (
     <Modal
       visible={visible}
@@ -76,7 +82,16 @@ export default function DropdownModal({
                   <CustomText text="No data available" />
                 </View>
               }
+              ListFooterComponent={
+                loading ? (
+                  <View style={styles.footerLoader}>
+                    <ActivityIndicator size="small" />
+                  </View>
+                ) : null
+              }
               showsVerticalScrollIndicator={false}
+              onEndReached={onEndReached} // 👈 triggers when scroll hits bottom
+              onEndReachedThreshold={0.5}
             />
           </View>
         )}
@@ -101,6 +116,11 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footerLoader: {
+    paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -52,22 +52,38 @@ const Header: React.FC<HeaderProps> = ({
   const [zones, setZones] = useState<Zone[]>([]);
   const [loadingZones, setLoadingZones] = useState(false);
   const dispatch = useDispatch();
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
-  const loadZones = async () => {
+  const loadZones = async (pageToLoad: number = 1) => {
+    if (loadingZones || !hasMore) return;
     setLoadingZones(true);
-    try {
-      const fetchedZones = await fetchZones('FL', 'fire');
-      console.log(zones);
 
-      setZones(fetchedZones);
+    try {
+      const fetchedZones = await fetchZones('FL', 'fire', pageToLoad, 30);
+
+      if (fetchedZones.length === 0) {
+        setHasMore(false);
+      } else {
+        setZones(prev => {
+          const merged = [...prev, ...fetchedZones];
+          return merged.filter(
+            (zone, index, self) =>
+              index === self.findIndex(z => z.id === zone.id),
+          );
+        });
+        setPage(pageToLoad);
+        if (fetchedZones.length < 30) setHasMore(false); // 👈 stop further calls
+      }
     } catch (error) {
       console.error('Error fetching zones:', error);
     } finally {
       setLoadingZones(false);
     }
   };
+
   useEffect(() => {
-    loadZones();
+    loadZones(1); // first load
   }, []);
 
   const locationRef = useRef<View>(null);
@@ -185,6 +201,8 @@ const Header: React.FC<HeaderProps> = ({
         position={dropdownPosition ?? undefined}
         maxHeight={400}
         width={'95%'}
+        onEndReached={() => loadZones(page + 1)} // 👈 load next page
+        loading={loadingZones}
       />
     </View>
   );

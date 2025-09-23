@@ -1,40 +1,41 @@
 import api from './api';
+type direction = number;
 
 export type Threshold = {
   temperature: number;
   humidity: number;
   wind_speed: {
     N: {
-      min: number;
-      max: number;
+      min: direction;
+      max: direction;
     };
     NE: {
-      min: number;
-      max: number;
+      min: direction;
+      max: direction;
     };
     E: {
-      min: number;
-      max: number;
+      min: direction;
+      max: direction;
     };
     SE: {
-      min: number;
-      max: number;
+      min: direction;
+      max: direction;
     };
     S: {
-      min: number;
-      max: number;
+      min: direction;
+      max: direction;
     };
     SW: {
-      min: number;
-      max: number;
+      min: direction;
+      max: direction;
     };
     W: {
-      min: number;
-      max: number;
+      min: direction;
+      max: direction;
     };
     NW: {
-      min: number;
-      max: number;
+      min: direction;
+      max: direction;
     };
   };
 };
