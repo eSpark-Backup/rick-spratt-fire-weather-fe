@@ -33,6 +33,16 @@ import {
   Threshold,
 } from '../../services/thermostatService';
 
+type WindDirectionSetting = {
+  icon: React.JSX.Element;
+  title: string;
+  rightValue: string;
+  minValue: number | null;
+  maxValue: number | null;
+  key: string;
+  type: string;
+};
+
 const SETTINGS_CONFIG = [
   {
     key: 'temperature',
@@ -157,16 +167,6 @@ export default function SettingsScreen() {
     });
   };
 
-  type WindDirectionSetting = {
-    icon: React.JSX.Element;
-    title: string;
-    rightValue: string;
-    minValue: number;
-    maxValue: number;
-    key: string;
-    type: string;
-  };
-
   const initializeWindDirections = (): WindDirectionSetting[] => {
     return WIND_DIRECTIONS_CONFIG.map(config => ({
       icon: <Flag />,
@@ -184,6 +184,9 @@ export default function SettingsScreen() {
     initializeWindDirections(),
   );
 
+  console.log("settings", settings);
+  console.log("windDirections", windDirections);
+  
   useEffect(() => {
     loadThresholdData();
   }, []);
@@ -199,7 +202,7 @@ export default function SettingsScreen() {
         setInitialDataLoaded(true);
       }
     } catch (error) {
-      console.error('Error loading threshold data:', error);
+      console.log('Error loading threshold data:', error);
       Alert.alert(
         'Error',
         'Failed to load threshold data. Using default values.',
@@ -214,23 +217,29 @@ export default function SettingsScreen() {
     setSettings(prev =>
       prev.map(item => {
         const apiValue = data[item.key as keyof Threshold];
-        if (apiValue !== undefined && apiValue !== null) {
-          const config = SETTINGS_CONFIG.find(c => c.key === item.key);
-          if (config) {
-            if (config.isKBDI && 'minValue' in item && 'maxValue' in item) {
-              return {
-                ...item,
-                rightValue: `${item.minValue}-${item.maxValue}`,
-              } as KBDISetting;
-            } else if (!config.isKBDI && 'value' in item) {
-              const numericValue =
-                typeof apiValue === 'string' ? parseFloat(apiValue) : apiValue;
-              return {
-                ...item,
-                value: numericValue,
-                rightValue: `${numericValue}${config.unit}`,
-              } as ValueSetting;
-            }
+        const config = SETTINGS_CONFIG.find(c => c.key === item.key);
+
+        if (config) {
+          if (config.isKBDI && 'minValue' in item && 'maxValue' in item) {
+            const minVal = item.minValue ?? 'N/A';
+            const maxVal = item.maxValue ?? 'N/A';
+            return {
+              ...item,
+              rightValue: `${minVal}-${maxVal}`,
+            } as KBDISetting;
+          } else if (!config.isKBDI && 'value' in item) {
+            const numericValue =
+              apiValue !== null && apiValue !== undefined
+                ? typeof apiValue === 'string'
+                  ? parseFloat(apiValue)
+                  : apiValue
+                : null;
+            return {
+              ...item,
+              value: numericValue,
+              rightValue:
+                numericValue === null ? 'N/A' : `${numericValue}${config.unit}`,
+            } as ValueSetting;
           }
         }
         return item;
@@ -243,14 +252,22 @@ export default function SettingsScreen() {
           const windApiValue =
             data.wind_speed[item.key as keyof typeof data.wind_speed];
           if (windApiValue) {
+            const minVal = windApiValue.min ?? null;
+            const maxVal = windApiValue.max ?? null;
             return {
               ...item,
               minValue: windApiValue.min,
               maxValue: windApiValue.max,
-              rightValue: `${windApiValue.min}-${windApiValue.max} mph`,
+              rightValue:
+                minVal === null || maxVal === null
+                  ? 'N/A'
+                  : `${minVal}-${maxVal} mph`,
             };
           }
-          return item;
+          return {
+            ...item,
+            rightValue: 'N/A',
+          };
         }),
       );
     }
@@ -268,6 +285,7 @@ export default function SettingsScreen() {
     setModalVisible(true);
   };
 
+  // Modify handleValueChange to not validate immediately
   const handleValueChange = (
     key: string,
     value: number | { min: number; max: number },
@@ -307,9 +325,9 @@ export default function SettingsScreen() {
           item.key === key
             ? {
                 ...item,
-                minValue: value.min,
-                maxValue: value.max,
-                rightValue: `${value.min}-${value.max} mph`,
+                minValue: value.min == 0 ? null : value.min,
+                maxValue: value.max == 0 ? null : value.max,
+                rightValue: value.min == 0 || value.max == 0 ? 'N/A' : `${value.min}-${value.max} mph`,
               }
             : item,
         ),
@@ -317,47 +335,96 @@ export default function SettingsScreen() {
     }
   };
 
-  const collectCurrentThresholdData = (): Threshold => {
-    const thresholdData: Threshold = {
-      temperature: settings.find(s => s.key === 'temperature')?.value ?? 80,
-      humidity: settings.find(s => s.key === 'humidity')?.value ?? 60,
-      wind_speed: {
-        N: { max: 0, min: 0 },
-        NE: { max: 0, min: 0 },
-        E: { max: 0, min: 0 },
-        SE: { max: 0, min: 0 },
-        S: { max: 0, min: 0 },
-        SW: { max: 0, min: 0 },
-        W: { max: 0, min: 0 },
-        NW: { max: 0, min: 0 },
-      },
-    };
+  // Add validation function
+  const validateSettings = (): boolean => {
+    // Validate main settings
+    for (const setting of settings) {
+      if ('value' in setting) {
+        const value = setting.value;
+        if (value !== null && value !== undefined) {
+          if (value < 0) {
+            Alert.alert(
+              'Invalid Value',
+              `${setting.title.replace('Set ', '')} cannot be negative`,
+            );
+            return false;
+          }
 
-    windDirections.forEach(dir => {
-      if (
-        dir.minValue !== undefined &&
-        dir.maxValue !== undefined &&
-        dir.minValue !== 0 &&
-        dir.maxValue !== 0
-      ) {
-        thresholdData.wind_speed[
-          dir.key as keyof typeof thresholdData.wind_speed
-        ] = {
-          min: dir.minValue,
-          max: dir.maxValue,
-        };
+          // Add specific validation for humidity
+          if (setting.key === 'humidity') {
+            if (value > 100) {
+              Alert.alert('Invalid Value', 'Rh cannot be greater than 100%');
+              return false;
+            }
+          }
+        }
       }
-    });
+      // ... existing KBDI and range validation ...
+      if ('minValue' in setting && 'maxValue' in setting) {
+        const minValue = setting.minValue;
+        const maxValue = setting.maxValue;
+        if (
+          (minValue !== null && minValue !== undefined && minValue < 0) ||
+          (maxValue !== null && maxValue !== undefined && maxValue < 0)
+        ) {
+          Alert.alert(
+            'Invalid Value',
+            `${setting.title.replace('Set ', '')} values cannot be negative`,
+          );
+          return false;
+        }
+        if (minValue != null && maxValue != null && minValue >= maxValue) {
+          Alert.alert(
+            'Invalid Range',
+            `${setting.title.replace(
+              'Set ',
+              '',
+            )} minimum value must be less than maximum value`,
+          );
+          return false;
+        }
+      }
+    }
 
-    return thresholdData;
+    // Validate wind directions
+    for (const direction of windDirections) {
+      if (direction.rightValue === 'N/A') {
+        continue;
+      }
+      if (direction.minValue < 0 || direction.maxValue < 0) {
+        Alert.alert(
+          'Invalid Value',
+          `${direction.title.replace('Set ', '')} values cannot be negative`,
+        );
+        return false;
+      }
+      if (
+        direction.minValue >= direction.maxValue &&
+        (direction.minValue !== 0 || direction.maxValue !== 0)
+      ) {
+        Alert.alert(
+          'Invalid Range',
+          `${direction.title.replace(
+            'Set ',
+            '',
+          )} minimum value must be less than maximum value`,
+        );
+        return false;
+      }
+    }
+
+    return true;
   };
 
+  // Update handleSetThreshold to include validation
   const handleSetThreshold = async () => {
+    if (!validateSettings()) {
+      return;
+    }
+
     try {
       setLoading(true);
-
       const thresholdData = collectCurrentThresholdData();
-
       console.log('Sending threshold data:', thresholdData);
 
       const response = await setThermostats(thresholdData as any);
@@ -375,7 +442,7 @@ export default function SettingsScreen() {
         ],
       );
     } catch (error) {
-      console.error('Error setting threshold:', error);
+      console.log('Error setting threshold:', error);
       Alert.alert(
         'Error',
         'Failed to update threshold values. Please try again.',
@@ -383,6 +450,51 @@ export default function SettingsScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const collectCurrentThresholdData = () => {
+    const thresholdData: Partial<Threshold> = {};
+
+    // Collect main settings
+    settings.forEach(setting => {
+      if ('value' in setting) {
+        if (setting.key === 'temperature' || setting.key === 'humidity') {
+          thresholdData[setting.key] = setting.value;
+        }
+      } else if (
+        'minValue' in setting &&
+        'maxValue' in setting &&
+        setting.key === 'kbdi'
+      ) {
+        thresholdData.kbdi = {
+          min: setting.minValue,
+          max: setting.maxValue,
+        };
+      }
+    });
+
+    // Collect wind direction settings
+    const windSpeedData = {
+      N: { min: 0, max: 0 },
+      NE: { min: 0, max: 0 },
+      E: { min: 0, max: 0 },
+      SE: { min: 0, max: 0 },
+      S: { min: 0, max: 0 },
+      SW: { min: 0, max: 0 },
+      W: { min: 0, max: 0 },
+      NW: { min: 0, max: 0 },
+    };
+    windDirections.forEach(direction => {
+      if (direction.key in windSpeedData) {
+        windSpeedData[direction.key as keyof typeof windSpeedData] = {
+          min: direction.minValue,
+          max: direction.maxValue,
+        };
+      }
+    });
+    thresholdData.wind_speed = windSpeedData;
+
+    return thresholdData;
   };
 
   if (!initialDataLoaded) {
@@ -443,7 +555,7 @@ export default function SettingsScreen() {
 
       {loading && (
         <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <ActivityIndicator size="large" color={coolColor} />
           <CustomText size={14} style={{ marginTop: 10 }}>
             Loading... Please wait
           </CustomText>
@@ -461,6 +573,7 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     paddingHorizontal: 12,
     flexGrow: 1,
+    paddingVertical: 10,
   },
   loadingContainer: {
     flex: 1,

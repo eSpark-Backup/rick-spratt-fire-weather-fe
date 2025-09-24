@@ -4,12 +4,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import {
   ActivityIndicator,
-  SafeAreaView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native';
-
 import { RootStackParamList } from './navigation';
 import HomeScreen from '../screens/Home';
 import NotificationsScreen from '../screens/Notification';
@@ -24,7 +22,7 @@ import CustomTabBar from '../components/CustomTabBar';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import CustomText from '../components/CustomText';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -120,12 +118,13 @@ export default function RootNavigation() {
   console.log('✅ RootNavigation mounted');
   return (
     <SafeAreaView
+      edges={['top', 'left', 'right']}
       style={[
         styles.safeArea,
-        {
-          paddingTop: useSafeAreaInsets().top,
-          paddingBottom: useSafeAreaInsets().bottom,
-        },
+        // {
+        //   paddingTop: useSafeAreaInsets().top,
+        //   paddingBottom: useSafeAreaInsets().bottom,
+        // },
       ]}
     >
       <NavigationContainer

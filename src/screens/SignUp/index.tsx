@@ -76,7 +76,7 @@ export default function SignUpScreen({ navigation }: Props) {
   //       if (fetchedZones.length < limit) setHasMore(false);
   //     }
   //   } catch (error) {
-  //     console.error('Error fetching zones:', error);
+  //     console.log('Error fetching zones:', error);
   //   } finally {
   //     setLoadingZones(false);
   //   }
@@ -155,7 +155,7 @@ export default function SignUpScreen({ navigation }: Props) {
             setErrors({ api: res.message || 'Signup failed' });
           }
         } catch (error: any) {
-          console.error(error);
+          console.log(error);
           setErrors({
             api: error.response?.data?.message || 'Something went wrong',
           });

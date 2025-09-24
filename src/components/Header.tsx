@@ -76,7 +76,7 @@ const Header: React.FC<HeaderProps> = ({
         if (fetchedZones.length < 30) setHasMore(false); // 👈 stop further calls
       }
     } catch (error) {
-      console.error('Error fetching zones:', error);
+      console.log('Error fetching zones:', error);
     } finally {
       setLoadingZones(false);
     }
@@ -127,7 +127,7 @@ const Header: React.FC<HeaderProps> = ({
         }),
       );
     } catch (err) {
-      console.error('Error updating zone:', err);
+      console.log('Error updating zone:', err);
     }
   };
 
