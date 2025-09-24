@@ -36,7 +36,7 @@ export const fetchWeatherObservations = async (
     console.log('Fetched weather observations:', response.data.data.weather);
     return response.data.data.weather;
   } catch (error: any) {
-    console.error('Error fetching weather observations:', error);
+    console.log('Error fetching weather observations:', error);
     throw error;
   }
 };

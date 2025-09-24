@@ -41,7 +41,7 @@ export default function ZoneSelection() {
       setZones(fetchedZones);
       setFilteredZones(fetchedZones);
     } catch (error) {
-      console.error('Error fetching zones:', error);
+      console.log('Error fetching zones:', error);
     } finally {
       setLoading(false);
     }

@@ -37,8 +37,8 @@ type WindDirectionSetting = {
   icon: React.JSX.Element;
   title: string;
   rightValue: string;
-  minValue: number;
-  maxValue: number;
+  minValue: number | null;
+  maxValue: number | null;
   key: string;
   type: string;
 };
@@ -184,6 +184,9 @@ export default function SettingsScreen() {
     initializeWindDirections(),
   );
 
+  console.log("settings", settings);
+  console.log("windDirections", windDirections);
+  
   useEffect(() => {
     loadThresholdData();
   }, []);
@@ -199,7 +202,7 @@ export default function SettingsScreen() {
         setInitialDataLoaded(true);
       }
     } catch (error) {
-      console.error('Error loading threshold data:', error);
+      console.log('Error loading threshold data:', error);
       Alert.alert(
         'Error',
         'Failed to load threshold data. Using default values.',
@@ -322,9 +325,9 @@ export default function SettingsScreen() {
           item.key === key
             ? {
                 ...item,
-                minValue: value.min,
-                maxValue: value.max,
-                rightValue: `${value.min}-${value.max} mph`,
+                minValue: value.min == 0 ? null : value.min,
+                maxValue: value.max == 0 ? null : value.max,
+                rightValue: value.min == 0 || value.max == 0 ? 'N/A' : `${value.min}-${value.max} mph`,
               }
             : item,
         ),
@@ -385,6 +388,9 @@ export default function SettingsScreen() {
 
     // Validate wind directions
     for (const direction of windDirections) {
+      if (direction.rightValue === 'N/A') {
+        continue;
+      }
       if (direction.minValue < 0 || direction.maxValue < 0) {
         Alert.alert(
           'Invalid Value',
@@ -436,7 +442,7 @@ export default function SettingsScreen() {
         ],
       );
     } catch (error) {
-      console.error('Error setting threshold:', error);
+      console.log('Error setting threshold:', error);
       Alert.alert(
         'Error',
         'Failed to update threshold values. Please try again.',

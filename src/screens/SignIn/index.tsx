@@ -111,6 +111,7 @@ export default function SignInScreen({ navigation }: Props) {
           );
         }
       } catch (error: any) {
+        console.log('Login error:', error);
         if (error?.response?.status === 401) {
           Alert.alert('Login Failed', 'Incorrect credentials');
         } else {

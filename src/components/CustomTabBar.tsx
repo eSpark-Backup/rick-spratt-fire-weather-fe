@@ -15,6 +15,7 @@ import { primaryColor } from '../constants/colors';
 import { getActiveRouteName } from '../navigation/RootNavigation';
 import { CustomTabBarProps } from '../types';
 import { logout } from '../redux/slices/authSlice';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const TABS = [
   {
@@ -47,7 +48,7 @@ const CustomTabBar: React.FC<CustomTabBarProps> = ({ navigation, state }) => {
       await AsyncStorage.removeItem('isUserLoggedIn');
       dispatch(logout());
     } catch (err) {
-      console.error('Error clearing token:', err);
+      console.log('Error clearing token:', err);
     }
     navigation.reset({
       index: 0,
@@ -56,7 +57,7 @@ const CustomTabBar: React.FC<CustomTabBarProps> = ({ navigation, state }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: useSafeAreaInsets().bottom }]}>
       {TABS.map(({ key, label, icon, navigateTo, isLogout }, index) => {
         const isFocused = state.index === index;
         const isSettings = label === 'Settings';

@@ -22,6 +22,6 @@ export { default as Flag } from './svgs/flag.svg';
 export { default as PlantKBDI } from './svgs/kbdi.svg';
 export { default as Wind } from './svgs/wind.svg';
 export { default as DropletHot } from './svgs/DropletHot.svg';
-export { default as FlagRed } from './svgs/flagRed.svg';
+export { default as FlagRed } from './svgs/FlagRed.svg';
 export { default as PlantRed } from './svgs/PlantRed.svg';
 export { default as WindHot } from './svgs/WindRed.svg';

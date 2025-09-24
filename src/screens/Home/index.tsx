@@ -62,7 +62,7 @@ export default function HomeScreen({ navigation }: Props) {
       console.log('[HomeScreen] Weather response:', data);
       setObservations(data);
     } catch (err) {
-      console.error('[HomeScreen] Failed to fetch weather:', err);
+      console.log('[HomeScreen] Failed to fetch weather:', err);
     } finally {
       if (!isRefresh) setLoading(false);
     }
@@ -80,7 +80,7 @@ export default function HomeScreen({ navigation }: Props) {
       const res = await getThermostats();
       setThreshold(res.data);
     } catch (err) {
-      console.error('[HomeScreen] Failed to fetch thresholds:', err);
+      console.log('[HomeScreen] Failed to fetch thresholds:', err);
     }
   };
 
