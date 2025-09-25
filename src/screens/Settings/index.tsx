@@ -47,7 +47,7 @@ const SETTINGS_CONFIG = [
   {
     key: 'temperature',
     icon: CloudCool,
-    title: 'Set Temperature',
+    title: 'Set Max Temperature',
     unit: ' °F',
     color: coolColor,
     defaultValue: 80,
@@ -57,7 +57,7 @@ const SETTINGS_CONFIG = [
   {
     key: 'humidity',
     icon: Droplet,
-    title: 'Set Rh',
+    title: 'Set Min Rh',
     unit: ' %',
     defaultValue: 60,
     isKBDI: false,

@@ -40,7 +40,7 @@ import CustomTileDual from '../../components/CustomTileDual';
 
 type Props = { navigation: RootStackNavigationProp<'HomeTabs'> };
 
-const COMMENT = 'Prescribed Conditions';
+const COMMENT = 'Current Conditions';
 
 export default function HomeScreen({ navigation }: Props) {
   const [observations, setObservations] = useState<WeatherObservation[]>([]);
