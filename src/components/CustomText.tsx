@@ -19,6 +19,8 @@ const CustomText: React.FC<CustomTextProps> = ({
 
   return (
     <Text
+      adjustsFontSizeToFit
+      allowFontScaling={false}
       style={[
         styles.defaultText,
         {

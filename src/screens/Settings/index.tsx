@@ -47,7 +47,7 @@ const SETTINGS_CONFIG = [
   {
     key: 'temperature',
     icon: CloudCool,
-    title: 'Set Temperature',
+    title: 'Set Max Temperature',
     unit: ' °F',
     color: coolColor,
     defaultValue: 80,
@@ -57,7 +57,7 @@ const SETTINGS_CONFIG = [
   {
     key: 'humidity',
     icon: Droplet,
-    title: 'Set Rh',
+    title: 'Set Min Rh',
     unit: ' %',
     defaultValue: 60,
     isKBDI: false,
@@ -184,9 +184,9 @@ export default function SettingsScreen() {
     initializeWindDirections(),
   );
 
-  console.log("settings", settings);
-  console.log("windDirections", windDirections);
-  
+  console.log('settings', settings);
+  console.log('windDirections', windDirections);
+
   useEffect(() => {
     loadThresholdData();
   }, []);
@@ -327,7 +327,10 @@ export default function SettingsScreen() {
                 ...item,
                 minValue: value.min == 0 ? null : value.min,
                 maxValue: value.max == 0 ? null : value.max,
-                rightValue: value.min == 0 || value.max == 0 ? 'N/A' : `${value.min}-${value.max} mph`,
+                rightValue:
+                  value.min == 0 || value.max == 0
+                    ? 'N/A'
+                    : `${value.min}-${value.max} mph`,
               }
             : item,
         ),
@@ -391,7 +394,7 @@ export default function SettingsScreen() {
       if (direction.rightValue === 'N/A') {
         continue;
       }
-      if (direction.minValue < 0 || direction.maxValue < 0) {
+      if (direction.minValue! < 0 || direction.maxValue! < 0) {
         Alert.alert(
           'Invalid Value',
           `${direction.title.replace('Set ', '')} values cannot be negative`,
@@ -399,7 +402,7 @@ export default function SettingsScreen() {
         return false;
       }
       if (
-        direction.minValue >= direction.maxValue &&
+        direction.minValue! >= direction.maxValue! &&
         (direction.minValue !== 0 || direction.maxValue !== 0)
       ) {
         Alert.alert(
@@ -487,8 +490,8 @@ export default function SettingsScreen() {
     windDirections.forEach(direction => {
       if (direction.key in windSpeedData) {
         windSpeedData[direction.key as keyof typeof windSpeedData] = {
-          min: direction.minValue,
-          max: direction.maxValue,
+          min: direction.minValue!,
+          max: direction.maxValue!,
         };
       }
     });

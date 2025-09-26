@@ -40,7 +40,7 @@ import CustomTileDual from '../../components/CustomTileDual';
 
 type Props = { navigation: RootStackNavigationProp<'HomeTabs'> };
 
-const COMMENT = 'Prescribed Conditions';
+const COMMENT = 'Current Conditions';
 
 export default function HomeScreen({ navigation }: Props) {
   const [observations, setObservations] = useState<WeatherObservation[]>([]);
@@ -106,12 +106,12 @@ export default function HomeScreen({ navigation }: Props) {
     dirThreshold?.max !== null &&
     !(dirThreshold?.min === 0 && dirThreshold?.max === 0);
 
-  const isOutOfRange =
+  const isInRange =
     isThresholdSet &&
     latest &&
     dirThreshold &&
-    (latest.windSpeed > dirThreshold.max ||
-      latest.windSpeed < dirThreshold.min);
+    latest.windSpeed >= dirThreshold.min &&
+    latest.windSpeed <= dirThreshold.max;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -172,14 +172,14 @@ export default function HomeScreen({ navigation }: Props) {
             />
             <CustomTileDual
               activeOpacity={1}
-              color={isOutOfRange ? tempColor : coolColor}
+              color={isInRange ? tempColor : coolColor}
               topTile={{
-                icon: isOutOfRange ? <WindHot /> : <Wind />,
+                icon: isInRange ? <WindHot /> : <Wind />,
                 title: 'Wind Speed',
                 rightValue: `${latest?.windSpeed?.toFixed(1)} mph`,
               }}
               bottomTile={{
-                icon: isOutOfRange ? <FlagRed /> : <Flag />,
+                icon: isInRange ? <FlagRed /> : <Flag />,
                 title: 'Wind Direction',
                 rightValue: latest.windDirection,
               }}
