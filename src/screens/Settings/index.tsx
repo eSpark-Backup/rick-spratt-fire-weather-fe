@@ -8,6 +8,8 @@ import {
   View,
   Dimensions,
 } from 'react-native';
+import crashlytics, { crash } from '@react-native-firebase/crashlytics';
+
 import CustomTile from '../../components/CustomTile';
 import CustomText from '../../components/CustomText';
 import CustomButton from '../../components/CustomButton';
@@ -32,6 +34,8 @@ import {
   setThermostats,
   Threshold,
 } from '../../services/thermostatService';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
 
 type WindDirectionSetting = {
   icon: React.JSX.Element;
@@ -141,6 +145,7 @@ export default function SettingsScreen() {
   const [selectedSetting, setSelectedSetting] = useState(null);
   const [loading, setLoading] = useState(false);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const initializeSettings = () => {
     return SETTINGS_CONFIG.filter(config => config.enabled).map(config => {
@@ -430,7 +435,16 @@ export default function SettingsScreen() {
       const thresholdData = collectCurrentThresholdData();
       console.log('Sending threshold data:', thresholdData);
 
+      crashlytics().log('Setting threshold values');
+      crashlytics().setUserId('test-user-01');
+      crashlytics().setAttribute('screen', 'settings');
+      crashlytics().setAttribute('userData', JSON.stringify(user));
+      crashlytics().setAttribute(
+        'thresholdData',
+        JSON.stringify(thresholdData),
+      );
       const response = await setThermostats(thresholdData as any);
+      // crashlytics().crash();
 
       Alert.alert(
         'Success',
@@ -445,6 +459,8 @@ export default function SettingsScreen() {
         ],
       );
     } catch (error) {
+      crashlytics().setAttribute('error', String(error));
+      crashlytics().recordError(new Error(error as string), 'non-fatal');
       console.log('Error setting threshold:', error);
       Alert.alert(
         'Error',
@@ -545,6 +561,9 @@ export default function SettingsScreen() {
         <CustomButton
           title={loading ? 'Setting...' : 'Set Prescribed'}
           onPress={handleSetThreshold}
+          // onPress={() => {
+          //   crashlytics().crash();
+          // }}
           disabled={loading}
         />
       </ScrollView>

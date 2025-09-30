@@ -2045,7 +2045,7 @@
   dependencies:
     plist "^3.1.0"
 
-"@react-native-firebase/crashlytics@^23.4.0":
+"@react-native-firebase/crashlytics@^23.0.0":
   version "23.4.0"
   resolved "https://registry.yarnpkg.com/@react-native-firebase/crashlytics/-/crashlytics-23.4.0.tgz#55913eaced726b42d24c71c29e4ae62dc94e4324"
   integrity sha512-R8NHA43S+Gy7IS9xmYU7ILo4crkD/L/d4GIDIZTdWJoL6OmPN52EoSBdgXW9ssDVBlNfEfQqmACp+KThTVEzXQ==
