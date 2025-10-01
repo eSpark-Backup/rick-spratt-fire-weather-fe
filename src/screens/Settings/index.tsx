@@ -195,14 +195,13 @@ export default function SettingsScreen() {
   useEffect(() => {
     loadThresholdData();
     
-    crashlytics().log('Settings screen viewed iOS');
-
-    // Force a crash after a short delay (to ensure initialization completes)
-    setTimeout(() => {
-      const crashlytics = getCrashlytics();
-      crash(crashlytics); // This will kill the app
-      console.log("App crashed for testing purposes");
-    }, 3000);
+    // crashlytics().log('Settings screen viewed iOS');
+    // // Force a crash after a short delay (to ensure initialization completes)
+    // setTimeout(() => {
+    //   const crashlytics = getCrashlytics();
+    //   crash(crashlytics); // This will kill the app
+    //   console.log("App crashed for testing purposes");
+    // }, 3000);
   }, []);
 
   const loadThresholdData = async () => {
