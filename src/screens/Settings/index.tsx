@@ -505,7 +505,7 @@ export default function SettingsScreen() {
     settings.forEach(setting => {
       if ('value' in setting) {
         if (setting.key === 'temperature' || setting.key === 'humidity') {
-          thresholdData[setting.key] = setting.value;
+          thresholdData[setting.key] = Number(setting.value);
         }
       } else if (
         'minValue' in setting &&
@@ -513,8 +513,8 @@ export default function SettingsScreen() {
         setting.key === 'kbdi'
       ) {
         thresholdData.kbdi = {
-          min: setting.minValue,
-          max: setting.maxValue,
+          min: Number(setting.minValue),
+          max: Number(setting.maxValue),
         };
       }
     });
@@ -533,8 +533,8 @@ export default function SettingsScreen() {
     windDirections.forEach(direction => {
       if (direction.key in windSpeedData) {
         windSpeedData[direction.key as keyof typeof windSpeedData] = {
-          min: direction.minValue!,
-          max: direction.maxValue!,
+          min: Number(direction.minValue!),
+          max: Number(direction.maxValue!),
         };
       }
     });
