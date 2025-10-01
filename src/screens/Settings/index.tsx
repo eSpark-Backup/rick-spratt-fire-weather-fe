@@ -8,7 +8,7 @@ import {
   View,
   Dimensions,
 } from 'react-native';
-import crashlytics, { crash } from '@react-native-firebase/crashlytics';
+import crashlytics, { crash, getCrashlytics } from '@react-native-firebase/crashlytics';
 
 import CustomTile from '../../components/CustomTile';
 import CustomText from '../../components/CustomText';
@@ -194,6 +194,14 @@ export default function SettingsScreen() {
 
   useEffect(() => {
     loadThresholdData();
+    
+    // crashlytics().log('Settings screen viewed iOS');
+    // // Force a crash after a short delay (to ensure initialization completes)
+    // setTimeout(() => {
+    //   const crashlytics = getCrashlytics();
+    //   crash(crashlytics); // This will kill the app
+    //   console.log("App crashed for testing purposes");
+    // }, 3000);
   }, []);
 
   const loadThresholdData = async () => {
