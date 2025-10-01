@@ -22,7 +22,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch } from 'react-redux';
 import { setIsLoggedIn, setUser } from '../../redux/slices/authSlice';
 import getDeviceToken from '../../utils/getDeviceToken';
-import crashlytics from '@react-native-firebase/crashlytics';
 
 type Props = { navigation: RootStackNavigationProp<'SignIn'> };
 
@@ -64,7 +63,6 @@ export default function SignInScreen({ navigation }: Props) {
   };
 
   const handleLogin = async () => {
-    crashlytics().crash(); // Test crash
     const emailErr = validateEmail(email);
     const passErr = validatePassword(password);
 
@@ -76,19 +74,11 @@ export default function SignInScreen({ navigation }: Props) {
         setLoading(true);
         const response = await login({ email: email.toLowerCase(), password });
         console.log('on sigin:', response);
-     
+
         if (response.success) {
           const userData = response.data;
           const { token } = userData;
-          console.log("userData", userData);
-          crashlytics().log('User signed in.');
-          await Promise.all([
-            crashlytics().setUserId(userData?.id ?? 'unknown'),
-            crashlytics().setAttributes({
-              email: email,
-              username: userData.username || 'N/A',
-            }),
-          ]);
+          console.log('userData', userData);
           // 1. Save token immediately
           await AsyncStorage.setItem('authToken', token);
           dispatch(setUser(userData));
