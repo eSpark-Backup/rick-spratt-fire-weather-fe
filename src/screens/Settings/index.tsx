@@ -462,13 +462,13 @@ export default function SettingsScreen() {
         'thresholdData',
         JSON.stringify(thresholdData),
       );
-      setError(state => ({
-        ...state,
-        thresholdData: JSON.stringify(thresholdData, null, 2),
-      }));
+      // setError(state => ({
+      //   ...state,
+      //   thresholdData: JSON.stringify(thresholdData, null, 2),
+      // }));
       const response = await setThermostats(thresholdData as any);
       // crashlytics().crash();
-      setError();
+      // setError();
       Alert.alert(
         'Success',
         response.message || 'Threshold values updated successfully',
@@ -485,10 +485,10 @@ export default function SettingsScreen() {
       crashlytics().setAttribute('error', String(error));
       crashlytics().recordError(new Error(error as string), 'non-fatal');
       console.log('Error setting threshold:', error);
-      setError(state => ({
-        ...state,
-        errorMessage: String(error),
-      }));
+      // setError(state => ({
+      //   ...state,
+      //   errorMessage: String(error),
+      // }));
       Alert.alert(
         'Error',
         'Failed to update threshold values. Please try again.',
@@ -584,7 +584,7 @@ export default function SettingsScreen() {
             ))}
           </>
         )}
-        {error?.thresholdData && error?.errorMessage && (
+        {/* {error?.thresholdData && error?.errorMessage && (
           <CustomText
             size={14}
             color="red"
@@ -593,7 +593,7 @@ export default function SettingsScreen() {
             {String(error.thresholdData)}
             {String(error.errorMessage)}
           </CustomText>
-        )}
+        )} */}
         <CustomButton
           title={loading ? 'Setting...' : 'Set Prescribed'}
           onPress={handleSetThreshold}
