@@ -8,7 +8,10 @@ import {
   View,
   Dimensions,
 } from 'react-native';
-import crashlytics, { crash, getCrashlytics } from '@react-native-firebase/crashlytics';
+import crashlytics, {
+  crash,
+  getCrashlytics,
+} from '@react-native-firebase/crashlytics';
 
 import CustomTile from '../../components/CustomTile';
 import CustomText from '../../components/CustomText';
@@ -144,6 +147,14 @@ export default function SettingsScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSetting, setSelectedSetting] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<
+    | {
+        errorMessage: string | null;
+        thresholdData: string | null;
+      }
+    | undefined
+  >();
+
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
   const { user } = useSelector((state: RootState) => state.auth);
 
@@ -194,7 +205,7 @@ export default function SettingsScreen() {
 
   useEffect(() => {
     loadThresholdData();
-    
+
     // crashlytics().log('Settings screen viewed iOS');
     // // Force a crash after a short delay (to ensure initialization completes)
     // setTimeout(() => {
@@ -451,9 +462,13 @@ export default function SettingsScreen() {
         'thresholdData',
         JSON.stringify(thresholdData),
       );
+      // setError(state => ({
+      //   ...state,
+      //   thresholdData: JSON.stringify(thresholdData, null, 2),
+      // }));
       const response = await setThermostats(thresholdData as any);
       // crashlytics().crash();
-
+      // setError();
       Alert.alert(
         'Success',
         response.message || 'Threshold values updated successfully',
@@ -470,6 +485,10 @@ export default function SettingsScreen() {
       crashlytics().setAttribute('error', String(error));
       crashlytics().recordError(new Error(error as string), 'non-fatal');
       console.log('Error setting threshold:', error);
+      // setError(state => ({
+      //   ...state,
+      //   errorMessage: String(error),
+      // }));
       Alert.alert(
         'Error',
         'Failed to update threshold values. Please try again.',
@@ -486,7 +505,7 @@ export default function SettingsScreen() {
     settings.forEach(setting => {
       if ('value' in setting) {
         if (setting.key === 'temperature' || setting.key === 'humidity') {
-          thresholdData[setting.key] = setting.value;
+          thresholdData[setting.key] = Number(setting.value);
         }
       } else if (
         'minValue' in setting &&
@@ -494,8 +513,8 @@ export default function SettingsScreen() {
         setting.key === 'kbdi'
       ) {
         thresholdData.kbdi = {
-          min: setting.minValue,
-          max: setting.maxValue,
+          min: Number(setting.minValue),
+          max: Number(setting.maxValue),
         };
       }
     });
@@ -514,8 +533,8 @@ export default function SettingsScreen() {
     windDirections.forEach(direction => {
       if (direction.key in windSpeedData) {
         windSpeedData[direction.key as keyof typeof windSpeedData] = {
-          min: direction.minValue!,
-          max: direction.maxValue!,
+          min: Number(direction.minValue!),
+          max: Number(direction.maxValue!),
         };
       }
     });
@@ -565,13 +584,19 @@ export default function SettingsScreen() {
             ))}
           </>
         )}
-
+        {/* {error?.thresholdData && error?.errorMessage && (
+          <CustomText
+            size={14}
+            color="red"
+            style={{ marginVertical: 10, flexWrap: 'wrap' }}
+          >
+            {String(error.thresholdData)}
+            {String(error.errorMessage)}
+          </CustomText>
+        )} */}
         <CustomButton
           title={loading ? 'Setting...' : 'Set Prescribed'}
           onPress={handleSetThreshold}
-          // onPress={() => {
-          //   crashlytics().crash();
-          // }}
           disabled={loading}
         />
       </ScrollView>
