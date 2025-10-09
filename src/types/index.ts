@@ -40,6 +40,11 @@ export type KBDISetting = BaseSetting & {
   maxValue: number;
   value?: undefined;
 };
+export type DIndexSetting = BaseSetting & {
+  minValue: number;
+  maxValue: number;
+  value?: undefined;
+};
 
 export type Setting = ValueSetting | KBDISetting;
 

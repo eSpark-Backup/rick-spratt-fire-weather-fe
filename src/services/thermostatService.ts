@@ -10,6 +10,10 @@ export type Threshold = {
     min: number;
     max: number;
   };
+  dispersion_index: {
+    min: number;
+    max: number;
+  };
   wind_speed: {
     N: {
       min: direction;

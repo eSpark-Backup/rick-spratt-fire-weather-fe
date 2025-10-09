@@ -8,6 +8,7 @@ export interface WeatherObservation {
   relativeHumidity: number;
   windDirection: WindDirection;
   windSpeed: number;
+  dispersionIndex: number;
 }
 
 export interface WeatherMeta {
