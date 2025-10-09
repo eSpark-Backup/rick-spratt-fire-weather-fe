@@ -22,6 +22,7 @@ import {
   WindHot,
   DropletHot,
   FlagRed,
+  PlantRed,
 } from '../../assets';
 import {
   bgColor,
@@ -101,6 +102,19 @@ export default function HomeScreen({ navigation }: Props) {
   const dir = latest?.windDirection;
   const dirThreshold = threshold?.wind_speed[dir!];
 
+  const dip = latest?.dispersionIndex;
+  console.log('🚀 ~ HomeScreen ~ dip:', dip);
+
+  const diThreshold = threshold?.dispersion_index;
+  console.log('🚀 ~ HomeScreen ~ diThreshold:', diThreshold);
+
+  const isDIndexInRange =
+    diThreshold &&
+    dip !== undefined &&
+    dip >= diThreshold.min &&
+    dip <= diThreshold.max;
+  console.log('🚀 ~ HomeScreen ~ isDIndexInRange:', isDIndexInRange);
+
   const isThresholdSet =
     dirThreshold?.min !== null &&
     dirThreshold?.max !== null &&
@@ -168,6 +182,13 @@ export default function HomeScreen({ navigation }: Props) {
                   ? tempColor
                   : coolColor
               }
+              activeOpacity={1}
+            />
+            <CustomTile
+              icon={isDIndexInRange ? <PlantKBDI /> : <PlantRed />}
+              title="Dispersion Index"
+              rightValue={`${latest?.dispersionIndex?.toFixed(0)}`}
+              color={!isDIndexInRange ? tempColor : coolColor}
               activeOpacity={1}
             />
             <CustomTileDual
