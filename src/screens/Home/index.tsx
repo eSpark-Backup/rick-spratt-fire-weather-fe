@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   ScrollView,
+  View,
 } from 'react-native';
 import { useSelector } from 'react-redux';
 
@@ -185,7 +186,32 @@ export default function HomeScreen({ navigation }: Props) {
               activeOpacity={1}
             />
             <CustomTile
-              icon={isDIndexInRange ? <PlantKBDI /> : <PlantRed />}
+              icon={
+                isDIndexInRange ? (
+                  <View
+                    style={{
+                      backgroundColor: '#B3D0D8',
+                      padding: 5,
+                      borderRadius: 100,
+                    }}
+                  >
+                    <PlantKBDI />
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      backgroundColor: '#FFCFC5',
+                      padding: 5,
+                      borderRadius: 100,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {/* Empty to align */}
+                    <PlantKBDI />
+                  </View>
+                )
+              }
               title="Dispersion Index"
               rightValue={`${latest?.dispersionIndex?.toFixed(0)}`}
               color={!isDIndexInRange ? tempColor : coolColor}
@@ -195,7 +221,31 @@ export default function HomeScreen({ navigation }: Props) {
               activeOpacity={1}
               color={isInRange ? tempColor : coolColor}
               topTile={{
-                icon: isInRange ? <WindHot /> : <Wind />,
+                icon: isInRange ? (
+                  <View
+                    style={{
+                      backgroundColor: '#FFCFC5',
+                      padding: 5,
+                      borderRadius: 100,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <WindHot />
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      backgroundColor: '#B3D0D8',
+                      padding: 5,
+                      borderRadius: 100,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Wind />
+                  </View>
+                ),
                 title: 'Wind Speed',
                 rightValue: `${latest?.windSpeed?.toFixed(1)} mph`,
               }}

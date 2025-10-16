@@ -176,7 +176,20 @@ export default function SettingsScreen() {
     SETTINGS_CONFIG.filter(c => c.enabled).map(config => {
       if (config.isRange) {
         return {
-          icon: <config.icon />,
+          icon:
+            config.key == 'dispersion_index' ? (
+              <View
+                style={{
+                  backgroundColor: '#B3D0D8',
+                  padding: 5,
+                  borderRadius: 100,
+                }}
+              >
+                <PlantKBDI />
+              </View>
+            ) : (
+              <config.icon />
+            ),
           title: config.title,
           rightValue: `${config.defaultMinValue}-${config.defaultMaxValue}`,
           minValue: config.defaultMinValue,
@@ -186,7 +199,20 @@ export default function SettingsScreen() {
         };
       }
       return {
-        icon: <config.icon />,
+        icon:
+          config.key == 'dispersion_index' ? (
+            <View
+              style={{
+                backgroundColor: '#B3D0D8',
+                padding: 5,
+                borderRadius: 100,
+              }}
+            >
+              <PlantKBDI />
+            </View>
+          ) : (
+            <config.icon />
+          ),
         title: config.title,
         rightValue: `${config.defaultValue}${config.unit}`,
         value: config.defaultValue,
@@ -558,7 +584,21 @@ export default function SettingsScreen() {
         {settings.map((setting, idx) => (
           <CustomTile
             key={`${setting.key}-${idx}`}
-            icon={setting.icon}
+            icon={
+              setting.key == 'dispersion_index' ? (
+                <View
+                  style={{
+                    backgroundColor: '#B3D0D8',
+                    padding: 5,
+                    borderRadius: 100,
+                  }}
+                >
+                  <PlantKBDI />
+                </View>
+              ) : (
+                setting.icon
+              )
+            }
             title={setting.title}
             rightValue={setting.rightValue}
             color={setting.color}
