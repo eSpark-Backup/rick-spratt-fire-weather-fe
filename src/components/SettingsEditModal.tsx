@@ -22,7 +22,10 @@ export default function SettingsEditModal({
   const [minValue, setMinValue] = useState<string>('');
   const [maxValue, setMaxValue] = useState<string>('');
   // In SettingsEditModal
-  const isRangeSetting = setting?.key === 'kbdi' || setting?.type === 'range';
+  const isRangeSetting =
+    setting?.key === 'kbdi' ||
+    setting?.type === 'range' ||
+    setting?.key === 'dindex';
   useEffect(() => {
     if (setting) {
       if (isRangeSetting) {

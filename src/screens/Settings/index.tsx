@@ -8,7 +8,10 @@ import {
   View,
   Dimensions,
 } from 'react-native';
-import crashlytics, { crash, getCrashlytics } from '@react-native-firebase/crashlytics';
+import crashlytics, {
+  crash,
+  getCrashlytics,
+} from '@react-native-firebase/crashlytics';
 
 import CustomTile from '../../components/CustomTile';
 import CustomText from '../../components/CustomText';
@@ -28,7 +31,7 @@ import {
   primaryColor,
   tempColor,
 } from '../../constants/colors';
-import { Setting, KBDISetting, ValueSetting } from '../../types';
+import { Setting, KBDISetting, ValueSetting, DIndexSetting } from '../../types';
 import {
   getThermostats,
   setThermostats,
@@ -57,6 +60,7 @@ const SETTINGS_CONFIG = [
     defaultValue: 80,
     isKBDI: false,
     enabled: true,
+    isRange: false,
   },
   {
     key: 'humidity',
@@ -65,6 +69,7 @@ const SETTINGS_CONFIG = [
     unit: ' %',
     defaultValue: 60,
     isKBDI: false,
+    isRange: false,
     enabled: true,
   },
   {
@@ -76,6 +81,18 @@ const SETTINGS_CONFIG = [
     defaultMaxValue: 500,
     isKBDI: true,
     enabled: false,
+    isRange: true,
+  },
+  {
+    key: 'dispersion_index',
+    icon: PlantKBDI,
+    title: 'Set Dispersion Index',
+    unit: '',
+    defaultMinValue: 40,
+    defaultMaxValue: 60,
+    isDIndex: true,
+    isRange: true,
+    enabled: true,
   },
 ];
 
@@ -144,12 +161,20 @@ export default function SettingsScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSetting, setSelectedSetting] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<
+    | {
+        errorMessage: string | null;
+        thresholdData: string | null;
+      }
+    | undefined
+  >();
+
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
   const { user } = useSelector((state: RootState) => state.auth);
 
-  const initializeSettings = () => {
-    return SETTINGS_CONFIG.filter(config => config.enabled).map(config => {
-      if (config.isKBDI) {
+  const initializeSettings = (): Setting[] =>
+    SETTINGS_CONFIG.filter(c => c.enabled).map(config => {
+      if (config.isRange) {
         return {
           icon: <config.icon />,
           title: config.title,
@@ -158,19 +183,17 @@ export default function SettingsScreen() {
           maxValue: config.defaultMaxValue,
           key: config.key,
           color: config.color,
-        } as KBDISetting;
-      } else {
-        return {
-          icon: <config.icon />,
-          title: config.title,
-          rightValue: `${config.defaultValue}${config.unit}`,
-          value: config.defaultValue,
-          key: config.key,
-          color: config.color,
-        } as ValueSetting;
+        };
       }
-    });
-  };
+      return {
+        icon: <config.icon />,
+        title: config.title,
+        rightValue: `${config.defaultValue}${config.unit}`,
+        value: config.defaultValue,
+        key: config.key,
+        color: config.color,
+      };
+    }) as Setting[];
 
   const initializeWindDirections = (): WindDirectionSetting[] => {
     return WIND_DIRECTIONS_CONFIG.map(config => ({
@@ -194,7 +217,7 @@ export default function SettingsScreen() {
 
   useEffect(() => {
     loadThresholdData();
-    
+
     // crashlytics().log('Settings screen viewed iOS');
     // // Force a crash after a short delay (to ensure initialization completes)
     // setTimeout(() => {
@@ -232,29 +255,33 @@ export default function SettingsScreen() {
         const apiValue = data[item.key as keyof Threshold];
         const config = SETTINGS_CONFIG.find(c => c.key === item.key);
 
-        if (config) {
-          if (config.isKBDI && 'minValue' in item && 'maxValue' in item) {
-            const minVal = item.minValue ?? 'N/A';
-            const maxVal = item.maxValue ?? 'N/A';
-            return {
-              ...item,
-              rightValue: `${minVal}-${maxVal}`,
-            } as KBDISetting;
-          } else if (!config.isKBDI && 'value' in item) {
-            const numericValue =
-              apiValue !== null && apiValue !== undefined
-                ? typeof apiValue === 'string'
-                  ? parseFloat(apiValue)
-                  : apiValue
-                : null;
-            return {
-              ...item,
-              value: numericValue,
-              rightValue:
-                numericValue === null ? 'N/A' : `${numericValue}${config.unit}`,
-            } as ValueSetting;
-          }
+        if (!config) return item;
+
+        if (
+          config.isRange &&
+          typeof apiValue === 'object' &&
+          apiValue !== null &&
+          'min' in apiValue &&
+          'max' in apiValue
+        ) {
+          const minVal = apiValue.min ?? config.defaultMinValue;
+          const maxVal = apiValue.max ?? config.defaultMaxValue;
+          // Remove 'value' property if present
+          const { value, ...rest } = item as any;
+          return {
+            ...rest,
+            minValue: minVal,
+            maxValue: maxVal,
+            rightValue: `${minVal}-${maxVal}`,
+          };
+        } else if (!config.isRange && typeof apiValue === 'number') {
+          return {
+            ...item,
+            value: apiValue,
+            rightValue: `${apiValue}${config.unit}`,
+          };
         }
+
         return item;
       }),
     );
@@ -262,25 +289,19 @@ export default function SettingsScreen() {
     if (data.wind_speed) {
       setWindDirections(prev =>
         prev.map(item => {
-          const windApiValue =
+          const wind =
             data.wind_speed[item.key as keyof typeof data.wind_speed];
-          if (windApiValue) {
-            const minVal = windApiValue.min ?? null;
-            const maxVal = windApiValue.max ?? null;
+          if (wind) {
+            const minVal = wind.min ?? 0;
+            const maxVal = wind.max ?? 0;
             return {
               ...item,
-              minValue: windApiValue.min,
-              maxValue: windApiValue.max,
-              rightValue:
-                minVal === null || maxVal === null
-                  ? 'N/A'
-                  : `${minVal}-${maxVal} mph`,
+              minValue: minVal,
+              maxValue: maxVal,
+              rightValue: `${minVal}-${maxVal} mph`,
             };
           }
-          return {
-            ...item,
-            rightValue: 'N/A',
-          };
+          return item;
         }),
       );
     }
@@ -289,11 +310,7 @@ export default function SettingsScreen() {
   const handleTilePress = (setting: any) => {
     setSelectedSetting({
       ...setting,
-      value: setting.value,
-      minValue: setting.minValue,
-      maxValue: setting.maxValue,
-      type:
-        setting.type || (setting.minValue !== undefined ? 'range' : 'value'),
+      type: setting.minValue !== undefined ? 'range' : 'value',
     });
     setModalVisible(true);
   };
@@ -310,14 +327,21 @@ export default function SettingsScreen() {
       setSettings(prev =>
         prev.map(item => {
           if (item.key === key) {
-            if (config.isKBDI && typeof value === 'object') {
+            if (
+              (config.isKBDI || config.isDIndex) &&
+              typeof value === 'object'
+            ) {
               return {
                 ...item,
                 minValue: value.min,
                 maxValue: value.max,
                 rightValue: `${value.min}-${value.max}`,
               } as KBDISetting;
-            } else if (!config.isKBDI && typeof value === 'number') {
+            } else if (
+              !config.isKBDI &&
+              !config.isDIndex &&
+              typeof value === 'number'
+            ) {
               return {
                 ...item,
                 value: value,
@@ -451,9 +475,13 @@ export default function SettingsScreen() {
         'thresholdData',
         JSON.stringify(thresholdData),
       );
+      // setError(state => ({
+      //   ...state,
+      //   thresholdData: JSON.stringify(thresholdData, null, 2),
+      // }));
       const response = await setThermostats(thresholdData as any);
       // crashlytics().crash();
-
+      // setError();
       Alert.alert(
         'Success',
         response.message || 'Threshold values updated successfully',
@@ -470,6 +498,10 @@ export default function SettingsScreen() {
       crashlytics().setAttribute('error', String(error));
       crashlytics().recordError(new Error(error as string), 'non-fatal');
       console.log('Error setting threshold:', error);
+      // setError(state => ({
+      //   ...state,
+      //   errorMessage: String(error),
+      // }));
       Alert.alert(
         'Error',
         'Failed to update threshold values. Please try again.',
@@ -481,45 +513,31 @@ export default function SettingsScreen() {
 
   const collectCurrentThresholdData = () => {
     const thresholdData: Partial<Threshold> = {};
-
-    // Collect main settings
     settings.forEach(setting => {
       if ('value' in setting) {
+        // Only assign to keys that expect a number value
         if (setting.key === 'temperature' || setting.key === 'humidity') {
-          thresholdData[setting.key] = setting.value;
+          (thresholdData as Threshold)[setting.key] = Number(setting.value);
         }
-      } else if (
-        'minValue' in setting &&
-        'maxValue' in setting &&
-        setting.key === 'kbdi'
-      ) {
-        thresholdData.kbdi = {
-          min: setting.minValue,
-          max: setting.maxValue,
-        };
+      } else if ('minValue' in setting && 'maxValue' in setting) {
+        // Only assign to keys that expect a min/max object
+        if (setting.key === 'kbdi' || setting.key === 'dispersion_index') {
+          (thresholdData as Threshold)[setting.key] = {
+            min: Number(setting.minValue),
+            max: Number(setting.maxValue),
+          };
+        }
       }
     });
 
-    // Collect wind direction settings
-    const windSpeedData = {
-      N: { min: 0, max: 0 },
-      NE: { min: 0, max: 0 },
-      E: { min: 0, max: 0 },
-      SE: { min: 0, max: 0 },
-      S: { min: 0, max: 0 },
-      SW: { min: 0, max: 0 },
-      W: { min: 0, max: 0 },
-      NW: { min: 0, max: 0 },
-    };
+    const wind_speed: any = {};
     windDirections.forEach(direction => {
-      if (direction.key in windSpeedData) {
-        windSpeedData[direction.key as keyof typeof windSpeedData] = {
-          min: direction.minValue!,
-          max: direction.maxValue!,
-        };
-      }
+      wind_speed[direction.key] = {
+        min: Number(direction.minValue),
+        max: Number(direction.maxValue),
+      };
     });
-    thresholdData.wind_speed = windSpeedData;
+    thresholdData.wind_speed = wind_speed;
 
     return thresholdData;
   };
@@ -565,13 +583,19 @@ export default function SettingsScreen() {
             ))}
           </>
         )}
-
+        {/* {error?.thresholdData && error?.errorMessage && (
+          <CustomText
+            size={14}
+            color="red"
+            style={{ marginVertical: 10, flexWrap: 'wrap' }}
+          >
+            {String(error.thresholdData)}
+            {String(error.errorMessage)}
+          </CustomText>
+        )} */}
         <CustomButton
           title={loading ? 'Setting...' : 'Set Prescribed'}
           onPress={handleSetThreshold}
-          // onPress={() => {
-          //   crashlytics().crash();
-          // }}
           disabled={loading}
         />
       </ScrollView>

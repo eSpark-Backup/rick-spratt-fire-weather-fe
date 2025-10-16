@@ -1,3 +1,5 @@
+import crashlytics from '@react-native-firebase/crashlytics';
+
 import api from './api';
 type direction = number;
 
@@ -5,6 +7,10 @@ export type Threshold = {
   temperature: number;
   humidity: number;
   kbdi: {
+    min: number;
+    max: number;
+  };
+  dispersion_index: {
     min: number;
     max: number;
   };
@@ -57,5 +63,7 @@ export const setThermostats = async (
   payload: Threshold,
 ): Promise<{ message: string }> => {
   const response = await api.post('/threshold', payload);
+  crashlytics().log('Thresholds setting API called');
+  crashlytics().setAttribute('thresholds', JSON.stringify(response));
   return response.data;
 };
