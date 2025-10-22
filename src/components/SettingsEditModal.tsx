@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 
 import CustomText from './CustomText';
-import { ChevronUp, ChevronDown } from '../assets';
+import { ChevronUp, ChevronDown, PlantKBDI } from '../assets';
 import { bgColor, coolColor } from '../constants/colors';
 import { SettingsEditModalProps } from '../types';
 
@@ -136,7 +136,19 @@ export default function SettingsEditModal({
         <TouchableOpacity style={styles.modalContent} activeOpacity={1}>
           <View style={styles.header}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              {setting.icon}
+              {setting.key == 'dispersion_index' ? (
+                <View
+                  style={{
+                    backgroundColor: '#B3D0D8',
+                    padding: 5,
+                    borderRadius: 100,
+                  }}
+                >
+                  <PlantKBDI />
+                </View>
+              ) : (
+                setting.icon
+              )}
               <CustomText
                 style={styles.title}
                 fontFamily="Gilroy-Medium"
