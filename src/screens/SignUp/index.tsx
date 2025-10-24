@@ -136,7 +136,11 @@ export default function SignUpScreen({ navigation }: Props) {
             deviceToken: typeof deviceToken === 'string' ? deviceToken : '',
           };
 
-          console.log('payload', payload, deviceToken);
+          console.log('payload', payload);
+          console.log(
+            '🚀 ~ handleNextOrSubmit ~ deviceToken:+++++++++++++',
+            deviceToken,
+          );
 
           const res = await signup(payload);
 

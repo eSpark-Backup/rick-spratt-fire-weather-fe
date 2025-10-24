@@ -8,35 +8,48 @@ import {
 import { AppDispatch } from '../redux/store';
 import { Notification } from '../types';
 
-export const fetchAllNotifications = () => async (dispatch: AppDispatch) => {
-  let allNotifications: Notification[] = [];
-  let page = 1;
-  let hasNextPage = true;
+export const fetchAllNotifications = () => {
+  return async (dispatch: AppDispatch) => {
+    let allNotifications: Notification[] = [];
+    let page = 1;
+    let hasNextPage = true;
 
-  dispatch(setNotificationsLoading(true));
-  try {
-    while (hasNextPage) {
-      const response = await api.get(`/notifications?page=${page}&limit=10`);
+    dispatch(setNotificationsLoading(true));
+    try {
+      while (hasNextPage) {
+        const response = await api.get(`/notifications?page=${page}&limit=10`);
 
-      const notifications = response.data.data.notifications;
-      const pagination = response.data.data.meta;
+        const notifications = response.data.data.notifications;
+        const pagination = response.data.data.meta;
 
-      console.log('Fetched page notifications:', notifications);
+        console.log('🚀 ~ fetchAllNotifications ~ response:', response);
 
-      allNotifications = allNotifications.concat(notifications);
-      hasNextPage = pagination.currentPage < pagination.totalPages;
-      console.log('Has next page:', hasNextPage);
-      page++;
+        console.log('Fetched page notifications:', notifications);
+
+        allNotifications = allNotifications.concat(notifications);
+        hasNextPage = pagination.currentPage < pagination.totalPages;
+        console.log('Has next page:', hasNextPage);
+        page++;
+      }
+
+      console.log('All fetched notifications:', allNotifications);
+      dispatch(setNotifications({ notifications: allNotifications }));
+    } catch (error: any) {
+      console.log(error?.message || 'Failed to fetch notifications');
+      dispatch(
+        setNotificationsError(
+          error?.message || 'Failed to fetch notifications',
+        ),
+      );
+    } finally {
+      dispatch(setNotificationsLoading(false));
     }
+  };
+};
 
-    console.log('All fetched notifications:', allNotifications);
-    dispatch(setNotifications({ notifications: allNotifications }));
-  } catch (error: any) {
-    console.log(error?.message || 'Failed to fetch notifications');
-    dispatch(
-      setNotificationsError(error?.message || 'Failed to fetch notifications'),
-    );
-  } finally {
-    dispatch(setNotificationsLoading(false));
-  }
+// new helper to fetch a single page (used for pagination)
+export const fetchNotificationsPage = async (page = 1, limit = 10) => {
+  const response = await api.get(`/notifications?page=${page}&limit=${limit}`);
+  // expected shape: response.data.data = { notifications: Notification[], meta: { currentPage, totalPages, ... } }
+  return response.data.data;
 };
