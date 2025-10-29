@@ -39,6 +39,7 @@ import { RootState } from '../../redux/store';
 import { Threshold, getThermostats } from '../../services/thermostatService';
 import { isExceeding, isLessThan } from '../../utils/isexceeding';
 import CustomTileDual from '../../components/CustomTileDual';
+import { useFocusEffect } from '@react-navigation/native';
 
 type Props = { navigation: RootStackNavigationProp<'HomeTabs'> };
 
@@ -86,9 +87,14 @@ export default function HomeScreen({ navigation }: Props) {
     }
   };
 
-  useEffect(() => {
-    loadThresholds();
-  }, []);
+  // useEffect(() => {
+  //   loadThresholds();
+  // }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadThresholds();
+    }, []),
+  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);

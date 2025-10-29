@@ -93,7 +93,9 @@ export default function SignUpScreen({ navigation }: Props) {
     if (!firstName.trim()) newErrors.firstName = 'First name is required';
     if (!lastName.trim()) newErrors.lastName = 'Last name is required';
     if (!email.trim()) newErrors.email = 'Email is required';
-    else if (!/^\S+@\S+\.\S+$/.test(email)) newErrors.email = 'Invalid email';
+    else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+      newErrors.email = 'Invalid email';
+    }
     if (!password.trim()) newErrors.password = 'Password is required';
     else if (password.length < 8) newErrors.password = 'Min 8 characters';
     else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password))
