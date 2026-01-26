@@ -6,6 +6,7 @@ import {
   ScrollView,
   View,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -13,10 +14,9 @@ import CustomText from '../../components/CustomText';
 import CustomInput from '../../components/CustomInput';
 import { RootStackNavigationProp } from '../../navigation/navigation';
 import CustomButton from '../../components/CustomButton';
-import CustomDropdown from '../../components/CustomDropdown';
 import { bgColor } from '../../constants/colors';
-import { zoneData } from '../../constants';
 import SuccessModal from '../../components/SuccessModal';
+import Disclaimer from '../../components/Disclaimer';
 import { signup } from '../../services/authService';
 import getDeviceToken from '../../utils/getDeviceToken';
 import { fetchZones, Zone } from '../../services/zoneService';
@@ -40,6 +40,8 @@ export default function SignUpScreen({ navigation }: Props) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [country, setCountry] = useState('US');
   const [state, setState] = useState('Florida');
+  const [contentToDisclaimer, setContentToDisclaimer] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSuccessModalVisible, setSuccessModalVisible] = useState(false);
   const dispatch = useDispatch();
@@ -107,6 +109,8 @@ export default function SignUpScreen({ navigation }: Props) {
       newErrors.confirmPassword = 'Passwords do not match';
     if (!country.trim()) newErrors.country = 'Country is required';
     if (!state.trim()) newErrors.state = 'State is required';
+    if (!contentToDisclaimer)
+      newErrors.disclaimer = 'You must agree to the disclaimer';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -269,6 +273,42 @@ export default function SignUpScreen({ navigation }: Props) {
                   value={'Florida'}
                   editable={false}
                 />
+
+                <View style={styles.disclaimerContainer}>
+                  <TouchableOpacity
+                    style={styles.checkboxContainer}
+                    onPress={() => setContentToDisclaimer(!contentToDisclaimer)}
+                  >
+                    <View
+                      style={[
+                        styles.checkbox,
+                        contentToDisclaimer && styles.checkboxChecked,
+                      ]}
+                    >
+                      {contentToDisclaimer && (
+                        <View style={styles.checkboxInner} />
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                  <View style={styles.disclaimerTextContainer}>
+                    <CustomText style={styles.disclaimerText}>
+                      I have read and agree to the{' '}
+                    </CustomText>
+                    <TouchableOpacity onPress={() => setShowDisclaimer(true)}>
+                      <CustomText style={styles.disclaimerLink}>
+                        Disclaimer
+                      </CustomText>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                {errors.disclaimer && (
+                  <CustomText
+                    color="red"
+                    style={{ fontSize: 12, marginTop: 5, textAlign: 'center' }}
+                  >
+                    {errors.disclaimer}
+                  </CustomText>
+                )}
               </>
             )}
 
@@ -334,6 +374,10 @@ export default function SignUpScreen({ navigation }: Props) {
               navigation.replace('HomeTabs');
             }}
           />
+          <Disclaimer
+            visible={showDisclaimer}
+            onClose={() => setShowDisclaimer(false)}
+          />
         </ScrollView>
         {step === 2 && (
           <View style={styles.bottomButtonContainer}>
@@ -380,5 +424,48 @@ const styles = StyleSheet.create({
   },
   bottomButtonContainer: {
     padding: 20,
+  },
+  disclaimerContainer: {
+    marginTop: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+  },
+  checkboxContainer: {
+    marginRight: 10,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 2,
+    borderColor: '#797777',
+    borderRadius: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxChecked: {
+    borderColor: '#335FD1',
+  },
+  checkboxInner: {
+    width: 10,
+    height: 10,
+    backgroundColor: '#335FD1',
+    borderRadius: 2,
+  },
+  disclaimerTextContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  disclaimerText: {
+    color: '#797777',
+    fontSize: 14,
+    fontFamily: 'Gilroy-Medium',
+  },
+  disclaimerLink: {
+    color: '#335FD1',
+    fontWeight: '500',
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
   },
 });

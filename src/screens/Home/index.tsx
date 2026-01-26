@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import { useSelector } from 'react-redux';
+import { useFocusEffect } from '@react-navigation/native';
 
 import { RootStackNavigationProp } from '../../navigation/navigation';
 import CustomTile from '../../components/CustomTile';
@@ -23,7 +24,6 @@ import {
   WindHot,
   DropletHot,
   FlagRed,
-  PlantRed,
 } from '../../assets';
 import {
   bgColor,
@@ -39,7 +39,6 @@ import { RootState } from '../../redux/store';
 import { Threshold, getThermostats } from '../../services/thermostatService';
 import { isExceeding, isLessThan } from '../../utils/isexceeding';
 import CustomTileDual from '../../components/CustomTileDual';
-import { useFocusEffect } from '@react-navigation/native';
 
 type Props = { navigation: RootStackNavigationProp<'HomeTabs'> };
 
@@ -176,7 +175,10 @@ export default function HomeScreen({ navigation }: Props) {
 
             <CustomTile
               icon={
-                isLessThan(latest.relativeHumidity, threshold.humidity) ? (
+                isLessThan(
+                  latest.relativeHumidity,
+                  threshold.relativeHumidity,
+                ) ? (
                   <DropletHot />
                 ) : (
                   <Droplet />
@@ -185,7 +187,7 @@ export default function HomeScreen({ navigation }: Props) {
               title="Rh"
               rightValue={`${latest?.relativeHumidity?.toFixed(0)} %`}
               color={
-                isLessThan(latest.relativeHumidity, threshold.humidity)
+                isLessThan(latest.relativeHumidity, threshold.relativeHumidity)
                   ? tempColor
                   : coolColor
               }

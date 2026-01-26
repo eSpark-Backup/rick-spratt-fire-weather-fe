@@ -7,6 +7,7 @@ import {
   UIManager,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
 
 import DropdownModal from './DropdownModal';
 import {
@@ -18,12 +19,9 @@ import {
 } from '../assets';
 import CustomText from './CustomText';
 import { CompositeNavProp } from '../navigation/navigation';
-import { selectedCountry, selectedState } from '../constants';
 import { labelColor } from '../constants/colors';
 import { DropdownItem, HeaderProps } from '../types';
-
 import { Zone, fetchZones, updateZone } from '../services/zoneService';
-import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { useDispatch } from 'react-redux';
 import { updateUserZone } from '../redux/slices/authSlice';
@@ -240,6 +238,7 @@ const styles = StyleSheet.create({
   center: {
     flex: 1,
     alignItems: 'center',
+    gap: 10,
   },
   placeholder: {
     width: 24,
@@ -247,7 +246,6 @@ const styles = StyleSheet.create({
   },
   greetingCustomText: {
     fontSize: 16,
-    marginBottom: 4,
   },
   locationContainer: {
     flexDirection: 'row',
@@ -255,8 +253,10 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   locationCustomText: {
+    maxWidth: '82%',
     fontSize: 14,
     color: '#555',
+    textAlign: 'center',
   },
 });
 
