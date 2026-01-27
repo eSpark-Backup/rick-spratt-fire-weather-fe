@@ -5,7 +5,7 @@ type direction = number;
 
 export type Threshold = {
   temperature: number;
-  humidity: number;
+  relativeHumidity: number;
   kbdi: {
     min: number;
     max: number;

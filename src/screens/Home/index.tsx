@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import { useSelector } from 'react-redux';
+import { useFocusEffect } from '@react-navigation/native';
 
 import { RootStackNavigationProp } from '../../navigation/navigation';
 import CustomTile from '../../components/CustomTile';
@@ -23,7 +24,6 @@ import {
   WindHot,
   DropletHot,
   FlagRed,
-  PlantRed,
 } from '../../assets';
 import {
   bgColor,
@@ -86,9 +86,14 @@ export default function HomeScreen({ navigation }: Props) {
     }
   };
 
-  useEffect(() => {
-    loadThresholds();
-  }, []);
+  // useEffect(() => {
+  //   loadThresholds();
+  // }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadThresholds();
+    }, []),
+  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -170,7 +175,10 @@ export default function HomeScreen({ navigation }: Props) {
 
             <CustomTile
               icon={
-                isLessThan(latest.relativeHumidity, threshold.humidity) ? (
+                isLessThan(
+                  latest.relativeHumidity,
+                  threshold.relativeHumidity,
+                ) ? (
                   <DropletHot />
                 ) : (
                   <Droplet />
@@ -179,7 +187,7 @@ export default function HomeScreen({ navigation }: Props) {
               title="Rh"
               rightValue={`${latest?.relativeHumidity?.toFixed(0)} %`}
               color={
-                isLessThan(latest.relativeHumidity, threshold.humidity)
+                isLessThan(latest.relativeHumidity, threshold.relativeHumidity)
                   ? tempColor
                   : coolColor
               }

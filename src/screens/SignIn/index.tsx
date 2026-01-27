@@ -9,19 +9,20 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch } from 'react-redux';
 
 import { RootStackNavigationProp } from '../../navigation/navigation';
 import CustomText from '../../components/CustomText';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
 import RadioButton from '../../components/RadioButton';
-import { bgColor, coolColor, tempColor } from '../../constants/colors';
+import { bgColor, coolColor } from '../../constants/colors';
 
 import { login, updateDeviceToken } from '../../services/authService';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useDispatch } from 'react-redux';
 import { setIsLoggedIn, setUser } from '../../redux/slices/authSlice';
 import getDeviceToken from '../../utils/getDeviceToken';
+import Disclaimer from '../../components/Disclaimer';
 
 type Props = { navigation: RootStackNavigationProp<'SignIn'> };
 
@@ -34,6 +35,7 @@ export default function SignInScreen({ navigation }: Props) {
   const [passwordError, setPasswordError] = useState('');
   const [selected, setSelected] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
   const dispatch = useDispatch();
 
   const loadRememberedCredentials = async () => {
@@ -86,8 +88,8 @@ export default function SignInScreen({ navigation }: Props) {
 
           // 2. Get FCM token and update backend
           const fcmToken = await getDeviceToken();
-          console.log("user fcmToken signIn", fcmToken);
-          
+          console.log('user fcmToken signIn', fcmToken);
+
           try {
             await updateDeviceToken(fcmToken!); // now interceptor has the token ✅
           } catch (err) {
@@ -199,8 +201,20 @@ export default function SignInScreen({ navigation }: Props) {
               <CustomText style={styles.link}> Sign Up</CustomText>
             </TouchableOpacity>
           </View>
+          <View style={styles.disclaimerContainer}>
+            <CustomText style={styles.disclaimerText}>
+              By logging in, you agree to the Fire Weather Alert
+            </CustomText>
+            <TouchableOpacity onPress={() => setShowDisclaimer(true)}>
+              <CustomText style={styles.disclaimerLink}>Disclaimer</CustomText>
+            </TouchableOpacity>
+          </View>
         </View>
       </KeyboardAvoidingView>
+      <Disclaimer
+        visible={showDisclaimer}
+        onClose={() => setShowDisclaimer(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -240,5 +254,26 @@ const styles = StyleSheet.create({
   link: {
     color: '#335FD1',
     fontWeight: '500',
+  },
+  disclaimerContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+    gap: 5,
+  },
+  disclaimerText: {
+    textAlign: 'center',
+    color: '#797777',
+    fontSize: 12,
+    marginTop: 10,
+    fontFamily: 'Gilroy-Medium',
+  },
+  disclaimerLink: {
+    color: '#335FD1',
+    fontWeight: '500',
+    fontSize: 12,
+    fontFamily: 'Gilroy-Bold',
+    marginTop: 2,
   },
 });

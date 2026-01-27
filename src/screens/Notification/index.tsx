@@ -23,6 +23,7 @@ import {
   setNotificationsLoading,
   setNotificationsError,
 } from '../../redux/slices/notificationSlice';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function NotificationsScreen() {
   const dispatch = useDispatch<AppDispatch>();
@@ -39,10 +40,16 @@ export default function NotificationsScreen() {
   const [loadingMore, setLoadingMore] = useState(false);
 
   // initial load: load page 1
-  useEffect(() => {
-    loadInitial();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch]);
+  // useEffect(() => {
+  //   loadInitial();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [dispatch]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadInitial();
+    }, []),
+  );
 
   const loadInitial = async () => {
     dispatch(setNotificationsLoading(true));

@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     color: '#333',
+    height: '100%',
   },
   inputTextError: {
     color: '#E74C3C',
