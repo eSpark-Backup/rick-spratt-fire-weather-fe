@@ -25,7 +25,9 @@ async function getDeviceToken() {
     console.log('[getDeviceToken] Permission granted:', permissionGranted);
 
     if (!permissionGranted) {
-      console.log('[getDeviceToken] Permission not granted, aborting token retrieval.');
+      console.log(
+        '[getDeviceToken] Permission not granted, aborting token retrieval.',
+      );
       return null;
     }
 
@@ -41,7 +43,10 @@ async function getDeviceToken() {
           console.log('[getDeviceToken] 🍏 APNS Token is null or undefined.');
         }
       } catch (apnsError) {
-        console.log('[getDeviceToken] ❌ Error retrieving APNS token:', apnsError);
+        console.log(
+          '[getDeviceToken] ❌ Error retrieving APNS token:',
+          apnsError,
+        );
       }
     }
 
@@ -56,23 +61,49 @@ async function getDeviceToken() {
       console.log('[getDeviceToken] ❌ Error retrieving FCM token:', fcmError);
     }
 
-    console.log('[getDeviceToken] Device tokens retrieval result:', { fcmToken, apnsToken });
+    console.log('[getDeviceToken] Device tokens retrieval result:', {
+      fcmToken,
+      apnsToken,
+    });
     // 🔗 Send tokens to backend here if needed
-    return Platform.OS === 'android' ? fcmToken : (fcmToken ? fcmToken : apnsToken);
+    return Platform.OS === 'android'
+      ? fcmToken
+      : fcmToken
+      ? fcmToken
+      : apnsToken;
   } catch (error) {
-    console.log('[getDeviceToken] ❌ Unexpected error in device token retrieval:', error);
+    console.log(
+      '[getDeviceToken] ❌ Unexpected error in device token retrieval:',
+      error,
+    );
     return null;
   }
 }
 
 // 👉 Setup notification listeners
 export const setupNotificationListeners = () => {
+  let alertShown = false;
+
   // Foreground messages
   messaging().onMessage(async remoteMessage => {
     console.log('📩 Foreground Notification:', remoteMessage);
+    // Cancel previous alert if a new one arrives
+    if (alertShown) {
+      return;
+    }
+
+    alertShown = true;
     Alert.alert(
       remoteMessage.notification?.title || 'Notification',
       remoteMessage.notification?.body || '',
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            alertShown = false;
+          },
+        },
+      ],
     );
   });
 

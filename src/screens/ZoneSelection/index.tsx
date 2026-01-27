@@ -8,11 +8,16 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
+
 import { fetchZones, Zone } from '../../services/zoneService';
 import CustomText from '../../components/CustomText';
-import { primaryColor } from '../../constants/colors';
-import { CompositeNavigationProp } from '@react-navigation/native';
-import { useDispatch } from 'react-redux';
+import {
+  bgColor,
+  brdrColor,
+  labelColor,
+  primaryColor,
+} from '../../constants/colors';
 import { updateUserZone } from '../../redux/slices/authSlice';
 
 // Update the params type to handle both cases
@@ -96,6 +101,7 @@ export default function ZoneSelection() {
               style={styles.searchInput}
               placeholder="Search zones..."
               value={searchQuery}
+              placeholderTextColor={labelColor}
               onChangeText={setSearchQuery}
             />
           </View>
@@ -114,17 +120,17 @@ export default function ZoneSelection() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: bgColor,
   },
   searchContainer: {
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: brdrColor,
   },
   searchInput: {
     height: 40,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: brdrColor,
     borderRadius: 8,
     paddingHorizontal: 12,
     backgroundColor: '#f9f9f9',
@@ -132,7 +138,7 @@ const styles = StyleSheet.create({
   zoneItem: {
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: brdrColor,
   },
   zoneName: {
     fontSize: 16,

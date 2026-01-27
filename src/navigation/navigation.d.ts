@@ -6,6 +6,9 @@ import { CompositeNavigationProp } from '@react-navigation/native';
 export type RootStackParamList = {
   SignIn: undefined;
   SignUp: undefined;
+  ForgotPasswordEmail: undefined;
+  ForgotPasswordOTP: { email: string };
+  ResetPassword: { email: string; token: string };
   HomeTabs: undefined; // contains bottom tab
   ZoneSelection?: {
     fromScreen: 'Home' | 'SignUp';

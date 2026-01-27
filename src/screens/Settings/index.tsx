@@ -12,32 +12,20 @@ import crashlytics, {
   crash,
   getCrashlytics,
 } from '@react-native-firebase/crashlytics';
+import { useSelector } from 'react-redux';
 
 import CustomTile from '../../components/CustomTile';
 import CustomText from '../../components/CustomText';
 import CustomButton from '../../components/CustomButton';
 import SettingsEditModal from '../../components/SettingsEditModal';
-import {
-  CloudCool,
-  CloudHot,
-  Droplet,
-  Flag,
-  PlantKBDI,
-  Wind,
-} from '../../assets';
-import {
-  bgColor,
-  coolColor,
-  primaryColor,
-  tempColor,
-} from '../../constants/colors';
-import { Setting, KBDISetting, ValueSetting, DIndexSetting } from '../../types';
+import { CloudCool, Droplet, Flag, PlantKBDI } from '../../assets';
+import { bgColor, coolColor } from '../../constants/colors';
+import { Setting, KBDISetting, ValueSetting } from '../../types';
 import {
   getThermostats,
   setThermostats,
   Threshold,
 } from '../../services/thermostatService';
-import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 
 type WindDirectionSetting = {
@@ -542,8 +530,13 @@ export default function SettingsScreen() {
     settings.forEach(setting => {
       if ('value' in setting) {
         // Only assign to keys that expect a number value
-        if (setting.key === 'temperature' || setting.key === 'humidity') {
+        if (setting.key === 'temperature') {
           (thresholdData as Threshold)[setting.key] = Number(setting.value);
+        }
+        if (setting.key === 'humidity') {
+          (thresholdData as Threshold)['relativeHumidity'] = Number(
+            setting.value,
+          );
         }
       } else if ('minValue' in setting && 'maxValue' in setting) {
         // Only assign to keys that expect a min/max object
