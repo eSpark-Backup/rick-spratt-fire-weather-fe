@@ -171,13 +171,20 @@ export default function SignInScreen({ navigation }: Props) {
         />
 
         <View style={styles.rememberMeContainer}>
-          <RadioButton
-            selected={selected}
-            onPress={() => setSelected(!selected)}
-          />
-          <CustomText size={17} color="#797777">
-            Remember Me
-          </CustomText>
+          <View style={styles.row}>
+            <RadioButton
+              selected={selected}
+              onPress={() => setSelected(!selected)}
+            />
+            <CustomText size={17} color="#797777">
+              Remember Me
+            </CustomText>
+          </View>
+          <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordEmail')}>
+            <CustomText size={17} color="#335FD1" fontFamily="Gilroy-Bold">
+              Forgot Password?
+            </CustomText>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.buttonContainer}>
@@ -236,9 +243,14 @@ const styles = StyleSheet.create({
   rememberMeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    justifyContent: 'space-between',
     paddingBottom: '22%',
     paddingTop: 10,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
   buttonContainer: {
     paddingHorizontal: 20,

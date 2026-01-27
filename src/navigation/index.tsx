@@ -14,6 +14,9 @@ import NotificationsScreen from '../screens/Notification';
 import SettingsScreen from '../screens/Settings';
 import SignInScreen from '../screens/SignIn';
 import SignUpScreen from '../screens/SignUp';
+import ForgotPasswordEmailScreen from '../screens/ForgotPassword/EmailScreen';
+import ForgotPasswordOTPScreen from '../screens/ForgotPassword/OTPScreen';
+import ResetPasswordScreen from '../screens/ForgotPassword/ResetPasswordScreen';
 import ZoneSelection from '../screens/ZoneSelection';
 import { getActiveRouteName, navigationRef } from './RootNavigation';
 import Header from '../components/Header';
@@ -93,6 +96,18 @@ function AppNavigator() {
     >
       <Stack.Screen name="SignIn" component={SignInScreen} />
       <Stack.Screen name="SignUp" component={SignUpScreen} />
+      <Stack.Screen
+        name="ForgotPasswordEmail"
+        component={ForgotPasswordEmailScreen}
+      />
+      <Stack.Screen
+        name="ForgotPasswordOTP"
+        component={ForgotPasswordOTPScreen}
+      />
+      <Stack.Screen
+        name="ResetPassword"
+        component={ResetPasswordScreen}
+      />
       <Stack.Screen
         name="HomeTabs"
         component={HomeTabs}
