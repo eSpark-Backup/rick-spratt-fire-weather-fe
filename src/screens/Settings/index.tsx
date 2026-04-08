@@ -264,9 +264,15 @@ export default function SettingsScreen() {
   };
 
   const updateSettingsFromAPI = (data: Threshold) => {
+    // Map settings keys to their corresponding API field names
+    const keyToApiField: Record<string, keyof Threshold> = {
+      humidity: 'relativeHumidity',
+    };
+
     setSettings(prev =>
       prev.map(item => {
-        const apiValue = data[item.key as keyof Threshold];
+        const apiField = keyToApiField[item.key] || (item.key as keyof Threshold);
+        const apiValue = data[apiField];
         const config = SETTINGS_CONFIG.find(c => c.key === item.key);
 
         if (!config) return item;
